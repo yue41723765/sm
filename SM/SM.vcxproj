@@ -108,7 +108,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LOGIN.h" />
-    <ClInclude Include="NewsWindow.h" />
+    <ClInclude Include="MsgWindow.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SM.h" />
     <ClInclude Include="SMDlg.h" />
@@ -118,7 +118,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LOGIN.cpp" />
-    <ClCompile Include="NewsWindow.cpp" />
+    <ClCompile Include="MsgWindow.cpp" />
     <ClCompile Include="SM.cpp" />
     <ClCompile Include="SMDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -134,6 +134,7 @@
     <Image Include="..\..\MiniNews\MiniNews\Res\Skin_QQ.bmp" />
     <Image Include="..\..\MiniNews\MiniNews\Res\Skin_WangWang.bmp" />
     <Image Include="..\..\MiniNews\MiniNews\Res\Skin_XunLei.bmp" />
+    <Image Include="res\CBTN.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

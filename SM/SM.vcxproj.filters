@@ -42,10 +42,10 @@
     <ClInclude Include="LOGIN.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="NewsWindow.h">
+    <ClInclude Include="WininetHttp.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="WininetHttp.h">
+    <ClInclude Include="MsgWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -62,10 +62,10 @@
     <ClCompile Include="LOGIN.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="NewsWindow.cpp">
+    <ClCompile Include="WininetHttp.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="WininetHttp.cpp">
+    <ClCompile Include="MsgWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -82,6 +82,9 @@
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="..\..\MiniNews\MiniNews\Res\Skin_XunLei.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\CBTN.bmp">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

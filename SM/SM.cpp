@@ -6,6 +6,7 @@
 #include "SM.h"
 #include "SMDlg.h"
 #include "LOGIN.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif

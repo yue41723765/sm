@@ -32,6 +32,7 @@ void CLOGIN::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_USERNAME, m_username);
 	DDX_Text(pDX, IDC_PASSWORD, m_password);
+	DDX_Control(pDX, IDC_LOGIN, b_login);
 }
 
 

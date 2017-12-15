@@ -6,7 +6,7 @@
 #include "SM.h"
 #include "SMDlg.h"
 #include "afxdialogex.h"
-#include "NewsWindow.h"
+#include "MsgWindow.h"
 #include "WininetHttp.h"
 #include "WinUser.h"
 #include <stdlib.h>
@@ -25,30 +25,14 @@
 NOTIFYICONDATA NotifyIcon;
 int sort_column; // 记录点击的列
 bool method; // 记录比较方法
-CNewsWindow NewsWindow;
+//MsgWindow NewsWindow;
 BOOL InitNews();
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 int m_minute = 0;//每个用户的提醒分钟
 int time_type = 1;//间隔分类
 int record=0;//记录上一次的时间
-class CAboutDlg : public CDialogEx
-{
-public:
-	CAboutDlg();
 
-// 对话框数据
-	enum { IDD = IDD_ABOUTBOX };
 
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
-
-// 实现
-protected:
-	DECLARE_MESSAGE_MAP()
-public:
-	virtual BOOL OnInitDialog();
-	afx_msg void SetWindowTextW();
-};
 
 
 //比较函数
@@ -109,20 +93,6 @@ void CSMDlg::ClistDlg(NMHDR*pNMHDR, LRESULT *pResult)
 }
 
 
-CAboutDlg::CAboutDlg() : CDialogEx(CAboutDlg::IDD)
-{
-}
-
-void CAboutDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialogEx::DoDataExchange(pDX);
-}
-
-BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
-	ON_COMMAND(IDC_STATIC, &CAboutDlg::SetWindowTextW)
-END_MESSAGE_MAP()
-
-
 // CSMDlg 对话框
 
 
@@ -150,6 +120,7 @@ BEGIN_MESSAGE_MAP(CSMDlg, CDialogEx)
 	ON_MESSAGE(WM_SHOWTASK, OnShowTask) //关闭变为最小化
 	ON_BN_CLICKED(IDNO, &CSMDlg::OnClickedIdno) //注销键
 	ON_WM_TIMER() //定时器
+
 END_MESSAGE_MAP()
 
 
@@ -396,8 +367,7 @@ void CSMDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
 	{
-		CAboutDlg dlgAbout;
-		dlgAbout.DoModal();
+		
 	}
 	else if (nID == SC_CLOSE)
 	{
@@ -448,7 +418,6 @@ HCURSOR CSMDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-
 //选择框处理数据 定时开始
 void CSMDlg::OnSelchangeCombo1()
 {
@@ -458,46 +427,26 @@ void CSMDlg::OnSelchangeCombo1()
 	buf.Format("%d", com_num);
 	switch (com_num)
 	{
-	case 0:
-		time_type = 1;
-		break;
+	case 0: {
+			time_type = 1;
+			break;
+	         }
 	case 1:
 		time_type = 2; break;
 	case 2:
-		NewsWindow.Show();
+		//NewsWindow.Show();
 		time_type = 4; break;
 	case 3:
-		CServerPushInfo * dlg;
-		dlg = new CServerPushInfo(_T("推送消息内容"));
-		dlg->Create(IDD_SERVERPUSHINFO_DIALOG, GetDesktopWindow());//第二个参数不要为NULL，必须是GetDesktopWindow()   
-		dlg->ShowWindow(SW_SHOWNORMAL);
-		time_type = 0; break;
-	default:
+	{
+		time_type = 0;
 		break;
+	}
+		
+	default: {break; }
+		
 	}
 }
 
-//右下角推送 创建
-BOOL InitNews()
-{
-	LPCTSTR lpNewsTitle = _T("有新任务");
-	LPCTSTR lpNewsContent = _T("有多条新任务需要您处理");
-	LPCTSTR lpNewsURL = _T("www.badu.com");
-	NewsWindow.SetSkin(MAKEINTRESOURCE(IDB_SKIN_QQ));
-	//CNewsWindow.SetSkin(MAKEINTRESOURCE(IDB_SKIN_WANGWANG));
-	//CNewsWindow.SetSkin(MAKEINTRESOURCE(IDB_SKIN_XUNLEI),0xFFFFFF);
-	if (!NewsWindow.Create(_T("您有新任务"))) 
-	{
-	    NewsWindow.Show();
-	    return FALSE;
-    }
-	//NewsWindow.Create(_T("消息通知"));
-	NewsWindow.SetNews(lpNewsTitle, lpNewsContent, lpNewsURL);
-	NewsWindow.Show();
-	NewsWindow.SetMainWindow(false);
-	NewsWindow.SetAutoClose();
-	return TRUE;
-}
 
 //注销按钮
 void CSMDlg::OnClickedIdno()
@@ -513,7 +462,7 @@ void CSMDlg::OnClickedIdno()
 }
 
 
-
+//定时器
 void CSMDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
@@ -521,7 +470,7 @@ void CSMDlg::OnTimer(UINT_PTR nIDEvent)
 	{
 	case 1:
 	{
-		//InitNews();
+	
 		CTime time = CTime::GetCurrentTime();
 		int  hour = time.GetHour();
 		int  minute = time.GetMinute();
@@ -534,15 +483,14 @@ void CSMDlg::OnTimer(UINT_PTR nIDEvent)
 			if (hour - record >= time_type)
 			{
 				record = hour;
-
-				InitNews();
-				// 主消息循环:
-				MSG msg;
-				while (GetMessage(&msg, NULL, 0, 0))
+				MsgWindow* p_MsgWindow = new MsgWindow;
+				p_MsgWindow->SetSkin(MAKEINTRESOURCE(IDB_SKIN_XUNLEI));
+				if (!p_MsgWindow->Create(m_hWnd, "通知"))
 				{
-					TranslateMessage(&msg);
-					DispatchMessage(&msg);
+					AfxMessageBox("推送失败，请打开窗口!"); return;
 				}
+				p_MsgWindow->SetMsg("您有新的任务", "共N条", "http://www.baidu.com");
+				p_MsgWindow->Show();
 			}
 		}
 		break;
@@ -551,40 +499,4 @@ void CSMDlg::OnTimer(UINT_PTR nIDEvent)
 		break;
 	}
 	CDialogEx::OnTimer(nIDEvent);
-}
-
-CString m_strInfo;
-BOOL CAboutDlg::OnInitDialog()
-{
-	CDialogEx::OnInitDialog();
-
-	// TODO:  在此添加额外的初始化
-	//获得桌面大小  
-	CRect rectWorkArea;
-	SystemParametersInfo(SPI_GETWORKAREA, 0, &rectWorkArea, SPIF_SENDCHANGE);
-
-	//获得对话框大小  
-	CRect rectDlg;
-	GetWindowRect(&rectDlg);
-	int iW = rectDlg.Width();
-	int iH = rectDlg.Height();
-
-	//将窗口设置到右下脚；  
-	::SetWindowPos(this->m_hWnd, HWND_BOTTOM, rectWorkArea.right - iW, rectWorkArea.bottom - iH, iW, iH, SWP_NOZORDER);
-
-	 //GetDlgItem(IDC_STATIC)->SetWindowTextW(m_strInfo);//设置弹出的消息内容，在构造函数中初始化消息内容m_strInfo  
-
-	::AnimateWindow(GetSafeHwnd(), 800, AW_SLIDE | AW_VER_NEGATIVE);//对话框从右下角慢慢升起  
-
-	CTime m_startTime = GetTickCount();   //获得对话框的起始时间  
-	SetTimer(2, 500, NULL);
-
-	return TRUE;  // return TRUE unless you set the focus to a control
-				  // 异常: OCX 属性页应返回 FALSE
-}
-
-
-void CAboutDlg::SetWindowTextW()
-{
-	// TODO: 在此添加命令处理程序代码
 }

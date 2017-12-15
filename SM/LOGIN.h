@@ -1,4 +1,5 @@
 #pragma once
+#include "afxwin.h"
 
 
 // CLOGIN ¶Ô»°¿ò
@@ -28,4 +29,5 @@ public:
 
 	afx_msg void OnEnChangePassword();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	CButton b_login;
 };

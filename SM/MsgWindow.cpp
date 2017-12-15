@@ -1,21 +1,18 @@
 #include "stdafx.h"
-#include "NewsWindow.h"
-#include <wingdi.h>
-#pragma comment(lib,"Msimg32.lib")
-#include <shellapi.h >
-#pragma comment(lib,"shell32.lib")
+#include "MsgWindow.h"
+#include "SMDlg.h"
 
 
-LRESULT CALLBACK CNewsWindow_WndProc(HWND, UINT, WPARAM, LPARAM);
+// MsgWindow
 
-CNewsWindow::CNewsWindow()
+IMPLEMENT_DYNAMIC(MsgWindow, CWnd)
+MsgWindow::MsgWindow()
 {
 	m_hArrowCursor = LoadCursor(NULL, IDC_ARROW);
 	m_hHandCursor = LoadCursor(NULL, IDC_HAND);
 	m_hCurCursor = m_hArrowCursor;
 	m_hAppSmallIcon = NULL;
 
-	m_hWnd = NULL;
 	m_hSkinDC = m_hCacheDC = NULL;
 	m_hSkinBitmap = m_hSkinOldBitmap = m_hCacheBitmap = m_hCacheOldBitmap = NULL;
 
@@ -30,26 +27,39 @@ CNewsWindow::CNewsWindow()
 	lf.lfWeight = FW_BOLD;
 	m_hBoldFont = CreateFontIndirect(&lf);
 
-	m_bMainWindow = FALSE;
-	m_bAutoClose = TRUE;
+	m_bClickAutoClose = FALSE;
+	m_isFadingOut = FALSE;
 	m_bTracking = FALSE;
 	m_strURL = _T("");
 }
 
 
-CNewsWindow::~CNewsWindow()
+MsgWindow::~MsgWindow()
 {
+
 	if (m_hSkinDC) {
 		SelectObject(m_hSkinDC, m_hSkinOldBitmap);
 		DeleteObject(m_hSkinBitmap);
 		DeleteDC(m_hSkinDC);
 	}
 }
-BOOL CNewsWindow::Create(LPCTSTR lpWindowName, int nWidth, int nHeight)
-{
-	return this->Create(_T("Comet_MiniNews"), lpWindowName, nWidth, nHeight);
-}
-BOOL CNewsWindow::Create(LPCTSTR lpClassName, LPCTSTR lpWindowName, int nWidth, int nHeight)
+BEGIN_MESSAGE_MAP(MsgWindow, CWnd)
+	ON_WM_ERASEBKGND()
+	ON_WM_PAINT()
+	ON_MESSAGE(WM_CONTROLCLICK, OnControlClick)
+	ON_WM_LBUTTONUP()
+	ON_WM_LBUTTONDOWN()
+	ON_WM_MOUSELEAVE()
+	ON_WM_MOUSEMOVE()
+	ON_WM_DESTROY()
+	ON_WM_SETCURSOR()
+	ON_WM_TIMER()
+	ON_WM_TIMER()
+	ON_WM_MOUSEHOVER()
+	ON_WM_NCLBUTTONDOWN()
+END_MESSAGE_MAP()
+
+BOOL MsgWindow::Create(HWND hWndParent, LPCTSTR lpWindowName, int nWidth, int nHeight, bool isAutoClose, bool clickAutoClose)
 {
 	if (IsWindow())return FALSE;
 	if (!m_hAppSmallIcon) {
@@ -59,42 +69,12 @@ BOOL CNewsWindow::Create(LPCTSTR lpClassName, LPCTSTR lpWindowName, int nWidth, 
 		SHGetFileInfo(szFileName, FILE_ATTRIBUTE_NORMAL, &shfi, sizeof(SHFILEINFO), SHGFI_ICON | SHGFI_SMALLICON);
 		m_hAppSmallIcon = shfi.hIcon;
 	}
-
-	HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(NULL);
-	WNDCLASSEX wcex;
-	ZeroMemory(&wcex, sizeof(WNDCLASSEX));
-	wcex.cbSize = sizeof(WNDCLASSEX);
-	if (!GetClassInfoEx(0, lpClassName, &wcex)) {
-		//注册窗口类
-		wcex.style = CS_HREDRAW | CS_VREDRAW;
-		wcex.lpfnWndProc = CNewsWindow_WndProc;
-		wcex.cbClsExtra = 0;
-		wcex.cbWndExtra = 0;
-		wcex.hInstance = hInstance;
-		wcex.hIcon = NULL;
-		wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
-		wcex.hbrBackground = (HBRUSH)(COLOR_BTNFACE + 1);
-		wcex.lpszMenuName = NULL;
-		wcex.lpszClassName = lpClassName;
-		wcex.hIconSm = m_hAppSmallIcon;
-
-		if (!RegisterClassEx(&wcex))
-			return FALSE;
-	}
-	//----------------------------
-	//创建窗口
 	DWORD dwStyle = WS_SYSMENU | WS_POPUP;
 	DWORD dwExStyle = WS_EX_TOOLWINDOW | WS_EX_TOPMOST;
-	HWND hWnd = CreateWindowEx(dwExStyle, lpClassName, lpWindowName, dwStyle, 0, 0, nWidth, nHeight, NULL, NULL, hInstance, NULL);
-	//----------------------------
-	if (!hWnd)
-	{
-		return FALSE;
-	}
-	//----------------------------
-	m_hWnd = hWnd;
-	SetProp(m_hWnd, _T("CometClassPtr"), this);
-	//----------------------------
+	CString strWndClass = AfxRegisterWndClass(0, AfxGetApp()->LoadStandardCursor(IDC_ARROW), GetSysColorBrush(COLOR_WINDOW), NULL);
+	BOOL bRet = CreateEx(dwExStyle, strWndClass, lpWindowName, dwStyle, 0, 0, nWidth, nHeight, hWndParent, NULL);
+	if (!bRet) return FALSE;
+
 	//创建子控件
 	m_nControlCount = 4;
 	m_pControls = (LPNEWSCONTROL)new NEWSCONTROL[m_nControlCount];
@@ -111,12 +91,21 @@ BOOL CNewsWindow::Create(LPCTSTR lpClassName, LPCTSTR lpWindowName, int nWidth, 
 	//----------------------------
 	//设置窗口圆角
 	HRGN hRgn = CreateRoundRectRgn(0, 0, nWidth + 1, nHeight + 1, 5, 5);
-	SetWindowRgn(m_hWnd, hRgn, FALSE);
+	SetWindowRgn(hRgn, FALSE);
 	DeleteObject(hRgn);
-	//----------------------------
+
+	m_Height = nHeight;
+	m_Width = nWidth;
+	m_bClickAutoClose = clickAutoClose;
+	m_isAutoClose = isAutoClose;
+	if (m_isAutoClose)
+	{
+		SetTimer(TIMER_WINDOW_DELAY, DELAY_TIME, NULL);
+	}
 	return TRUE;
 }
-BOOL CNewsWindow::SetNews(LPCTSTR lpNewsTitle, LPCTSTR lpNewsContent, LPCTSTR lpNewsURL)
+
+BOOL MsgWindow::SetMsg(LPCTSTR lpNewsTitle, LPCTSTR lpNewsContent, LPCTSTR lpNewsURL/*=""*/)
 {
 	if (!m_nControlCount)return FALSE;
 	m_pControls[2].strText = lpNewsTitle;
@@ -125,30 +114,23 @@ BOOL CNewsWindow::SetNews(LPCTSTR lpNewsTitle, LPCTSTR lpNewsContent, LPCTSTR lp
 	DrawWindowEx();
 	return TRUE;
 }
-void CNewsWindow::Show()
+
+void MsgWindow::Show()
 {
 	//在桌面右下角显示
 	RECT rc;
-	GetClientRect(m_hWnd, &rc);
+	GetClientRect(&rc);
 	int nWidth = rc.right - rc.left;
 	int nHeight = rc.bottom - rc.top;
 	//取出桌面工作区
 	SystemParametersInfo(SPI_GETWORKAREA, NULL, &rc, NULL);
-	SetWindowPos(m_hWnd, NULL, rc.right - nWidth, rc.bottom - nHeight, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOREDRAW);
+	SetWindowPos(NULL, rc.right - nWidth, rc.bottom - nHeight, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOREDRAW);
 
-	ShowWindow(m_hWnd, SW_SHOW);
-	UpdateWindow(m_hWnd);
+	ShowWindow(SW_SHOW);
+	UpdateWindow();
 }
-void CNewsWindow::SetMainWindow(BOOL bMainWindow)
-{
-	m_bMainWindow = bMainWindow;
-}
-void CNewsWindow::SetAutoClose(BOOL bAutoClose)
-{
-	m_bAutoClose = bAutoClose;
 
-}
-void CNewsWindow::CreateControl(LPNEWSCONTROL pControl, int nType, int x, int y, int nWidth, int nHeight, CString strText)
+void MsgWindow::CreateControl(LPNEWSCONTROL pControl, int nType, int x, int y, int nWidth, int nHeight, CString strText/*=""*/)
 {
 	pControl->nType = nType;
 	pControl->strText = strText;
@@ -158,7 +140,8 @@ void CNewsWindow::CreateControl(LPNEWSCONTROL pControl, int nType, int x, int y,
 	pControl->nHeight = nHeight;
 	pControl->Rect = CreateRect(x, y, x + nWidth, y + nHeight);
 }
-BOOL CNewsWindow::SetSkin(LPCTSTR lpBitmapName, COLORREF CaptionColor)
+
+BOOL MsgWindow::SetSkin(LPCTSTR lpBitmapName, COLORREF CaptionColor/*=0x000000*/)
 {
 	HBITMAP hBitmap = LoadBitmap((HINSTANCE)GetModuleHandle(NULL), lpBitmapName);
 	if (!hBitmap)return FALSE;
@@ -169,9 +152,9 @@ BOOL CNewsWindow::SetSkin(LPCTSTR lpBitmapName, COLORREF CaptionColor)
 	}
 	//----------------------------
 	if (!m_hSkinDC) {
-		HDC hSrcDC = GetDC(0);
+		HDC hSrcDC = ::GetDC(0);
 		m_hSkinDC = CreateCompatibleDC(hSrcDC);
-		ReleaseDC(0, hSrcDC);
+		::ReleaseDC(0, hSrcDC);
 	}
 	//----------------------------
 	m_hSkinBitmap = hBitmap;
@@ -182,34 +165,36 @@ BOOL CNewsWindow::SetSkin(LPCTSTR lpBitmapName, COLORREF CaptionColor)
 	//----------------------------
 	return TRUE;
 }
-BOOL CNewsWindow::DrawWindowEx()
+
+BOOL MsgWindow::DrawWindowEx()
 {
 	if (!IsWindow())return FALSE;
 	if (!DrawWindow())return FALSE;
-	if (IsWindowVisible(m_hWnd)) {
+	if (IsWindowVisible()) {
 		RECT rc;
-		GetClientRect(m_hWnd, &rc);
+		GetClientRect(&rc);
 		int nWidth = rc.right - rc.left;
 		int nHeight = rc.bottom - rc.top;
-		HDC hDC = GetDC(m_hWnd);
-		BitBlt(hDC, 0, 0, nWidth, nHeight, m_hCacheDC, 0, 0, SRCCOPY);
-		ReleaseDC(m_hWnd, hDC);
+		HDC hDC = ::GetDC(m_hWnd);
+		::BitBlt(hDC, 0, 0, nWidth, nHeight, m_hCacheDC, 0, 0, SRCCOPY);
+		::ReleaseDC(m_hWnd, hDC);
 	}
 	return TRUE;
 }
-BOOL CNewsWindow::DrawWindow()
+
+BOOL MsgWindow::DrawWindow()
 {
 	if (!m_hSkinDC)return FALSE;
 	RECT rc;
-	GetClientRect(m_hWnd, &rc);
+	GetClientRect(&rc);
 	int nWidth = rc.right - rc.left;
 	int nHeight = rc.bottom - rc.top;
 	if (!m_hCacheDC) {
-		HDC hSrcDC = GetDC(0);
+		HDC hSrcDC = ::GetDC(0);
 		m_hCacheDC = CreateCompatibleDC(hSrcDC);
 		m_hCacheBitmap = CreateCompatibleBitmap(hSrcDC, nWidth, nHeight);
 		m_hCacheOldBitmap = (HBITMAP)SelectObject(m_hCacheDC, m_hCacheBitmap);
-		ReleaseDC(0, hSrcDC);
+		::ReleaseDC(0, hSrcDC);
 		SetBkMode(m_hCacheDC, TRANSPARENT);
 	}
 	//画出背景 ------------------------------------
@@ -218,16 +203,16 @@ BOOL CNewsWindow::DrawWindow()
 	DrawNineRect(m_hCacheDC, rc, rcSrc, rcNine);
 	//画出标题 ------------------------------------
 	RECT rcText = CreateRect(8, 5, nWidth - 50, 5 + 16);
-	HICON hIcon = (HICON)SendMessage(m_hWnd, WM_GETICON, ICON_SMALL, NULL);
+	HICON hIcon = (HICON)SendMessage(WM_GETICON, ICON_SMALL, NULL);
 	if (!hIcon)hIcon = m_hAppSmallIcon;
 	if (hIcon) {
 		DrawIconEx(m_hCacheDC, rcText.left, rcText.top, hIcon, 16, 16, NULL, NULL, DI_NORMAL);
 		rcText.left += 25;
 	}
-	int nLen = GetWindowTextLength(m_hWnd);
+	int nLen = GetWindowTextLength();
 	if (nLen) {
 		CString strText;
-		GetWindowText(m_hWnd, strText.GetBuffer(nLen + 1), nLen + 1);
+		GetWindowText(strText.GetBuffer(nLen + 1), nLen + 1);
 		strText.ReleaseBuffer();
 		HFONT hOldFont = (HFONT)SelectObject(m_hCacheDC, m_hFont);
 		SetTextColor(m_hCacheDC, m_CaptionColor);
@@ -241,7 +226,8 @@ BOOL CNewsWindow::DrawWindow()
 	DrawStatic(m_hCacheDC, &m_pControls[3]);
 	return TRUE;
 }
-void CNewsWindow::DrawButton(HDC hDC, LPNEWSCONTROL pControl)
+
+void MsgWindow::DrawButton(HDC hDC, LPNEWSCONTROL pControl)
 {
 	int nSrcX = 0;
 	int nSrcY = 0;
@@ -265,7 +251,8 @@ void CNewsWindow::DrawButton(HDC hDC, LPNEWSCONTROL pControl)
 	//-----------------------
 	BitBlt(hDC, pControl->x, pControl->y, pControl->nWidth, pControl->nHeight, m_hSkinDC, nSrcX, nSrcY, SRCCOPY);
 }
-void CNewsWindow::DrawStatic(HDC hDC, LPNEWSCONTROL pControl)
+
+void MsgWindow::DrawStatic(HDC hDC, LPNEWSCONTROL pControl)
 {
 	if (pControl->strText == _T(""))return;
 	HFONT hFont = NULL;
@@ -277,7 +264,7 @@ void CNewsWindow::DrawStatic(HDC hDC, LPNEWSCONTROL pControl)
 		break;
 	case NCT_CONTENT:
 		hFont = m_hFont;
-		uFormat = DT_WORDBREAK | DT_NOPREFIX | DT_WORD_ELLIPSIS;
+		uFormat = DT_WORDBREAK | DT_EDITCONTROL | DT_NOPREFIX/*|DT_WORD_ELLIPSIS*/;
 		break;
 	}
 	//-----------------------
@@ -292,35 +279,9 @@ void CNewsWindow::DrawStatic(HDC hDC, LPNEWSCONTROL pControl)
 	DrawText(hDC, pControl->strText, -1, &pControl->Rect, uFormat);
 	SelectObject(hDC, hOldFont);
 }
-LRESULT CNewsWindow::OnEraseBkgnd(UINT message, WPARAM wParam, LPARAM lParam)
-{
-	if (!m_hCacheDC) {
-		if (!DrawWindow())
-			return DefWindowProc(message, wParam, lParam);
-	}
-	RECT rc;
-	GetClientRect(m_hWnd, &rc);
-	int nWidth = rc.right - rc.left;
-	int nHeight = rc.bottom - rc.top;
-	BitBlt((HDC)wParam, 0, 0, nWidth, nHeight, m_hCacheDC, 0, 0, SRCCOPY);
-	return 1;
-}
-LRESULT CNewsWindow::OnPaint(UINT message, WPARAM wParam, LPARAM lParam)
-{
-	if (!m_hCacheDC) {
-		if (!DrawWindow())
-			return DefWindowProc(message, wParam, lParam);
-	}
-	PAINTSTRUCT ps;
-	BeginPaint(m_hWnd, &ps);
-	int nWidth = ps.rcPaint.right - ps.rcPaint.left;
-	int nHeight = ps.rcPaint.bottom - ps.rcPaint.top;
-	BitBlt(ps.hdc, ps.rcPaint.left, ps.rcPaint.top, nWidth, nHeight, m_hCacheDC, ps.rcPaint.left, ps.rcPaint.top, SRCCOPY);
-	EndPaint(m_hWnd, &ps);
-	return 0;
-}
+
 //画九宫图(目标DC，目标矩形，来源矩形，九宫矩形，透明颜色)
-void CNewsWindow::DrawNineRect(HDC hdcDest, RECT DestRect, RECT SrcRect, RECT NineRect, UINT crTransparent)
+void MsgWindow::DrawNineRect(HDC hdcDest, RECT DestRect, RECT SrcRect, RECT NineRect, UINT crTransparent)
 {
 	int x = 0, y = 0, nWidth, nHeight;
 	int xSrc = 0, ySrc = 0, nSrcWidth, nSrcHeight;
@@ -389,9 +350,9 @@ void CNewsWindow::DrawNineRect(HDC hdcDest, RECT DestRect, RECT SrcRect, RECT Ni
 	nWidth = SrcRect.right - NineRect.right;
 	xSrc = NineRect.right;
 	::TransparentBlt(hdcDest, x, y, nWidth, nHeight, m_hSkinDC, xSrc, ySrc, nWidth, nHeight, crTransparent);
-
 }
-RECT CNewsWindow::CreateRect(LONG left, LONG top, LONG right, LONG bottom)
+
+RECT MsgWindow::CreateRect(LONG left, LONG top, LONG right, LONG bottom)
 {
 	RECT rc;
 	rc.left = left;
@@ -400,7 +361,8 @@ RECT CNewsWindow::CreateRect(LONG left, LONG top, LONG right, LONG bottom)
 	rc.bottom = bottom;
 	return rc;
 }
-BOOL CNewsWindow::IsWindow()
+
+BOOL MsgWindow::IsWindow()
 {
 	if (!m_hWnd) {
 		return FALSE;
@@ -413,29 +375,78 @@ BOOL CNewsWindow::IsWindow()
 		return TRUE;
 	}
 }
-BOOL CNewsWindow::DestroyWindow()
-{
-	if (IsWindow()) {
-		return ::DestroyWindow(m_hWnd);
-	}
-	return FALSE;
-}
-void CNewsWindow::SetCursor(HCURSOR hCursor)
-{
-	if (m_hCurCursor != hCursor) {
-		m_hCurCursor = hCursor;
-		::SetCursor(m_hCurCursor);
-	}
-}
-int CNewsWindow::ControlFromPoint(LPARAM lParam)
-{
-	POINT pt;
-	pt.x = LOWORD(lParam);
-	pt.y = HIWORD(lParam);
-	return ControlFromPoint(pt);
 
+// MsgWindow 消息处理程序
+
+BOOL MsgWindow::OnEraseBkgnd(CDC* pDC)
+{
+	if (!m_hCacheDC) {
+		if (!DrawWindow())
+			return CWnd::OnEraseBkgnd(pDC);
+	}
+	RECT rc;
+	GetClientRect(&rc);
+	int nWidth = rc.right - rc.left;
+	int nHeight = rc.bottom - rc.top;
+	::BitBlt(pDC->m_hDC, 0, 0, nWidth, nHeight, m_hCacheDC, 0, 0, SRCCOPY);
+	return TRUE;
 }
-int CNewsWindow::ControlFromPoint(POINT pt)
+
+
+void MsgWindow::OnPaint()
+{
+	CPaintDC dc(this); // device context for painting
+	if (!m_hCacheDC) {
+		if (!DrawWindow())
+			return;
+	}
+	PAINTSTRUCT ps;
+	BeginPaint(&ps);
+	int nWidth = ps.rcPaint.right - ps.rcPaint.left;
+	int nHeight = ps.rcPaint.bottom - ps.rcPaint.top;
+	::BitBlt(ps.hdc, ps.rcPaint.left, ps.rcPaint.top, nWidth, nHeight, m_hCacheDC, ps.rcPaint.left, ps.rcPaint.top, SRCCOPY);
+	EndPaint(&ps);
+}
+
+void MsgWindow::SetAutoClose(BOOL bAutoClose)
+{
+	m_bClickAutoClose = bAutoClose;
+}
+
+void MsgWindow::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	int nControlIndex = ControlFromPoint(point);
+	if (m_nDownIndex != -1) {
+		if (m_nDownIndex == nControlIndex) {
+			PostMessage(WM_CONTROLCLICK, (WPARAM)nControlIndex, 0);
+		}
+		m_nDownIndex = -1;
+		DrawWindowEx();
+	}
+
+	CWnd::OnLButtonUp(nFlags, point);
+}
+
+LRESULT MsgWindow::OnControlClick(WPARAM wParam, LPARAM lParam)
+{
+	int nControlIndex = (int)wParam;
+	if (nControlIndex<0 || nControlIndex >= m_nControlCount)return 0;
+	//----------------------------
+	if (nControlIndex == NCT_CLOSE) {
+		PostMessage(WM_CLOSE, NULL, NULL);
+	}
+	else {
+		if (m_strURL != _T("")) {
+			::ShellExecute(NULL, _T("Open"), m_strURL, NULL, NULL, SW_SHOW);
+		}
+		if (m_bClickAutoClose) {
+			PostMessage(WM_CLOSE, NULL, NULL);
+		}
+	}
+	return 0;
+}
+
+int MsgWindow::ControlFromPoint(POINT pt)
 {
 	for (int i = 0; i<m_nControlCount; i++) {
 		if (PtInRect(&m_pControls[i].Rect, pt)) {
@@ -444,10 +455,51 @@ int CNewsWindow::ControlFromPoint(POINT pt)
 	}
 	return -1;
 }
-LRESULT  CNewsWindow::OnMouseMove(UINT message, WPARAM wParam, LPARAM lParam)
+
+void MsgWindow::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	LRESULT lRet = DefWindowProc(message, wParam, lParam);
+	//判断鼠标是否点击了DirectUI子控件
+	int nControlIndex = ControlFromPoint(point);
+	if (m_nDownIndex != nControlIndex) {
+		m_nDownIndex = nControlIndex;
+		DrawWindowEx();
+	}
 	//-------------------------------------------------------
+	if (nControlIndex == -1) { //未点击子控件
+		ReleaseCapture(); //释放鼠标
+		SendMessage(WM_NCLBUTTONDOWN, HTCAPTION, 0);//发送标题栏按下消息
+	}
+	CWnd::OnLButtonDown(nFlags, point);
+}
+
+
+void MsgWindow::OnMouseHover(UINT nFlags, CPoint point)
+{
+	if (m_isAutoClose && !m_isFadingOut)
+	{
+		KillTimer(TIMER_WINDOW_DELAY);
+	}
+	CWnd::OnMouseHover(nFlags, point);
+}
+
+void MsgWindow::OnMouseLeave()
+{
+	if (m_nHoverIndex != -1 || m_nDownIndex != -1) {
+		m_nDownIndex = m_nHoverIndex = -1;
+		DrawWindowEx();
+	}
+	m_bTracking = FALSE;
+
+	if (m_isAutoClose && !m_isFadingOut)
+	{
+		SetTimer(TIMER_WINDOW_DELAY, DELAY_TIME, NULL);
+	}
+	CWnd::OnMouseLeave();
+}
+
+
+void MsgWindow::OnMouseMove(UINT nFlags, CPoint point)
+{
 	if (!m_bTracking)
 	{
 		TRACKMOUSEEVENT   tme;
@@ -458,7 +510,7 @@ LRESULT  CNewsWindow::OnMouseMove(UINT message, WPARAM wParam, LPARAM lParam)
 		m_bTracking = TrackMouseEvent(&tme);
 	}
 	//-------------------------------------------------------
-	int nControlIndex = ControlFromPoint(lParam);
+	int nControlIndex = ControlFromPoint(point);
 	if (m_nHoverIndex != nControlIndex) {
 		m_nHoverIndex = nControlIndex;
 		DrawWindowEx();
@@ -469,55 +521,20 @@ LRESULT  CNewsWindow::OnMouseMove(UINT message, WPARAM wParam, LPARAM lParam)
 			SetCursor(m_hHandCursor);
 		}
 	}
-	return lRet;
+	CWnd::OnMouseMove(nFlags, point);
 }
-LRESULT  CNewsWindow::OnLButtonDown(UINT message, WPARAM wParam, LPARAM lParam)
-{
-	LRESULT lRet = DefWindowProc(message, wParam, lParam);
-	//-------------------------------------------------------
-	//判断鼠标是否点击了DirectUI子控件
-	int nControlIndex = ControlFromPoint(lParam);
-	if (m_nDownIndex != nControlIndex) {
-		m_nDownIndex = nControlIndex;
-		DrawWindowEx();
-	}
-	//-------------------------------------------------------
-	if (nControlIndex == -1) { //未点击子控件
-		ReleaseCapture(); //释放鼠标
-		::SendMessage(m_hWnd, WM_NCLBUTTONDOWN, HTCAPTION, 0);//发送标题栏按下消息
-	}
-	return lRet;
-}
-LRESULT  CNewsWindow::OnLButtonUp(UINT message, WPARAM wParam, LPARAM lParam)
-{
-	LRESULT lRet = DefWindowProc(message, wParam, lParam);
-	int nControlIndex = ControlFromPoint(lParam);
-	if (m_nDownIndex != -1) {
-		if (m_nDownIndex == nControlIndex) {
-			PostMessage(m_hWnd, WM_CONTROLCLICK, (WPARAM)nControlIndex, lParam);
-		}
-		m_nDownIndex = -1;
-		DrawWindowEx();
-	}
-	return lRet;
-}
-LRESULT CNewsWindow::OnMouseHover(UINT message, WPARAM wParam, LPARAM lParam)
-{
 
-	return DefWindowProc(message, wParam, lParam);
-}
-LRESULT CNewsWindow::OnMouseLeave(UINT message, WPARAM wParam, LPARAM lParam)
+void MsgWindow::SetCursor(HCURSOR hCursor)
 {
-	if (m_nHoverIndex != -1 || m_nDownIndex != -1) {
-		m_nDownIndex = m_nHoverIndex = -1;
-		DrawWindowEx();
+	if (m_hCurCursor != hCursor) {
+		m_hCurCursor = hCursor;
+		::SetCursor(m_hCurCursor);
 	}
-	m_bTracking = FALSE;
-	return DefWindowProc(message, wParam, lParam);
 }
-LRESULT  CNewsWindow::OnDestroy(UINT message, WPARAM wParam, LPARAM lParam)
+
+void MsgWindow::OnDestroy()
 {
-	LRESULT lRet = DefWindowProc(message, wParam, lParam);
+	CWnd::OnDestroy();
 	//----------------------------
 	if (m_pControls)delete[]m_pControls;
 	m_pControls = NULL;
@@ -534,82 +551,56 @@ LRESULT  CNewsWindow::OnDestroy(UINT message, WPARAM wParam, LPARAM lParam)
 	//----------------------------
 	m_strURL = _T("");
 	m_bTracking = FALSE;
-	//----------------------------
-	if (m_bMainWindow)
-		PostQuitMessage(0);
-	//----------------------------
-	return lRet;
 }
-LRESULT  CNewsWindow::OnSetCursor(UINT message, WPARAM wParam, LPARAM lParam)
+
+
+BOOL MsgWindow::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 {
 	::SetCursor(m_hCurCursor);
-	return 1;
+	return TRUE;
 }
-LRESULT CNewsWindow::OnControlClick(UINT message, WPARAM wParam, LPARAM lParam)
+
+
+void MsgWindow::PostNcDestroy()
 {
-	int nControlIndex = (int)wParam;
-	if (nControlIndex<0 || nControlIndex >= m_nControlCount)return 0;
-	//----------------------------
-	if (nControlIndex == NCT_CLOSE) {
-		PostMessage(m_hWnd, WM_CLOSE, NULL, NULL);
-	}
-	else {
-		if (m_strURL != _T("")) {
-			::ShellExecute(NULL, _T("Open"), m_strURL, NULL, NULL, SW_SHOW);
-		}
-		if (m_bAutoClose) {
-			PostMessage(m_hWnd, WM_CLOSE, NULL, NULL);
-		}
-	}
-	//----------------------------
-	return 0;
+	delete this;
+	CWnd::PostNcDestroy();
 }
-LRESULT CNewsWindow::OnMessage(UINT message, WPARAM wParam, LPARAM lParam)
+
+void MsgWindow::OnTimer(UINT_PTR nIDEvent)
 {
-	switch (message)
+	RECT rect;
+	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+	int y = rect.bottom;
+	int x = rect.right - m_Width;
+	switch (nIDEvent)
 	{
-	case WM_ERASEBKGND:
-		return OnEraseBkgnd(message, wParam, lParam);
+	case TIMER_WINDOW_DELAY:
+		KillTimer(TIMER_WINDOW_DELAY);
+		SetTimer(TIMER_WINDOW_FADEOUT, 20, NULL);
+		m_isFadingOut = true;
 		break;
-	case WM_PAINT:
-		return OnPaint(message, wParam, lParam);
+	case TIMER_WINDOW_FADEOUT:
+		if (m_Height >= 0)
+		{
+			m_Height -= 4;
+			MoveWindow(x, y - m_Height, m_Width, m_Height);
+		}
+		else
+		{
+			KillTimer(TIMER_WINDOW_FADEOUT);
+			PostMessage(WM_CLOSE, NULL, NULL);
+		}
 		break;
-	case WM_MOUSEMOVE:
-		return OnMouseMove(message, wParam, lParam);
-		break;
-	case WM_MOUSEHOVER:
-		return OnMouseHover(message, wParam, lParam);
-		break;
-	case WM_MOUSELEAVE:
-		return OnMouseLeave(message, wParam, lParam);
-		break;
-	case WM_LBUTTONDOWN:
-		return OnLButtonDown(message, wParam, lParam);
-		break;
-	case WM_LBUTTONUP:
-		return OnLButtonUp(message, wParam, lParam);
-		break;
-	case WM_CONTROLCLICK:
-		return OnControlClick(message, wParam, lParam);
-		break;
-	case WM_DESTROY:
-		return OnDestroy(message, wParam, lParam);
-		break;
-	case WM_SETCURSOR:
-		return OnSetCursor(message, wParam, lParam);
+	default:
 		break;
 	}
-	return DefWindowProc(message, wParam, lParam);
+	CWnd::OnTimer(nIDEvent);
 }
-LRESULT CNewsWindow::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+
+//屏蔽标题栏拖动
+void MsgWindow::OnNcLButtonDown(UINT nHitTest, CPoint point)
 {
-	return ::DefWindowProc(m_hWnd, message, wParam, lParam);
-}
-LRESULT CALLBACK CNewsWindow_WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	CNewsWindow* pWnd = (CNewsWindow*)GetProp(hWnd, _T("CometClassPtr"));
-	if (pWnd) {
-		return pWnd->OnMessage(message, wParam, lParam);
-	}
-	return DefWindowProc(hWnd, message, wParam, lParam);
+	if (nHitTest == HTCAPTION) return;
+	CWnd::OnNcLButtonDown(nHitTest, point);
 }

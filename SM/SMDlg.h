@@ -6,6 +6,7 @@
 #include "afxcmn.h"
 #include "afxwin.h"
 #include <iostream>
+#include "resource.h"
 #define MAX_PATH 260
 using namespace std;
 
@@ -15,9 +16,8 @@ class CSMDlg : public CDialogEx
 // 构造
 public:
 	CSMDlg(CWnd* pParent = NULL);	// 标准构造函数
-
 // 对话框数据
-	enum { IDD = IDD_SM_DIALOG };
+	enum { IDD = IDD_SM_DIALOG};
 	CTime time;
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
