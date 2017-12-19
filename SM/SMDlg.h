@@ -7,6 +7,7 @@
 #include "afxwin.h"
 #include <iostream>
 #include "resource.h"
+#include "ListCtrlCl.h"
 #define MAX_PATH 260
 using namespace std;
 
@@ -34,10 +35,12 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
-
+	
+	void setData();
 public:
+	void ShowDialog();
 	afx_msg void ClistDlg(NMHDR *pNMHDR, LRESULT *pResult);
-	CListCtrl m_list_port;
+	CListCtrlCl m_list_port;
 	CComboBox m_chosecom;
 	afx_msg void OnSelchangeCombo1();
 	afx_msg void OnClickedIdno();

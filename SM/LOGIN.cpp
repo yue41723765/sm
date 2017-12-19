@@ -15,16 +15,17 @@ IMPLEMENT_DYNAMIC(CLOGIN, CDialog)
 WininetHttp http;
 CLOGIN::CLOGIN(CWnd* pParent /*=NULL*/)
 	: CDialog(CLOGIN::IDD, pParent)
-	//, m_password(_T(""))
 {
 
 	//对话框里显示的东西
 	m_username = _T("");
 	m_password = _T("");
+
 }
 
 CLOGIN::~CLOGIN()
 {
+	
 }
 
 void CLOGIN::DoDataExchange(CDataExchange* pDX)
@@ -32,6 +33,8 @@ void CLOGIN::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_USERNAME, m_username);
 	DDX_Text(pDX, IDC_PASSWORD, m_password);
+	//DDX_Control(pDX, IDC_LOGIN, b_login);
+	GetDlgItem(IDC_LOGIN)->SetWindowTextA(_T("强制更改"));
 	DDX_Control(pDX, IDC_LOGIN, b_login);
 }
 
@@ -40,6 +43,7 @@ BEGIN_MESSAGE_MAP(CLOGIN, CDialog)
 	ON_BN_CLICKED(IDC_LOGIN, &CLOGIN::OnClickedLogin)
 	ON_WM_ERASEBKGND()
 	ON_WM_CTLCOLOR()
+	ON_WM_DRAWITEM()
 	ON_EN_CHANGE(IDC_PASSWORD, &CLOGIN::OnEnChangePassword)
 END_MESSAGE_MAP()
 
@@ -76,12 +80,12 @@ void CLOGIN::OnClickedLogin()
 
 }
 
-//背景图片出错弹bug
+//背景图片
 BOOL CLOGIN::OnEraseBkgnd(CDC* pDC)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
-	/*CBitmap bitmap; //创建位图
-	bitmap.LoadBitmap(IDB_BITMAP1); //载入位图
+	CBitmap bitmap; //创建位图
+	bitmap.LoadBitmap(IDB_BITMAP2); //载入位图
 	BITMAP bmp; //构造结构体
 	bitmap.GetBitmap(&bmp); //用位图信息填充结构体
 	CDC dcCompatible; //CDC类的兼容dc
@@ -91,30 +95,27 @@ BOOL CLOGIN::OnEraseBkgnd(CDC* pDC)
 	GetClientRect(&rect);
 	//pDC->BitBlt(0,0,rect.Width(),rect.Height(),&dcCompatible,.0,0,SRCCOPY);//1:1显示
 	pDC->StretchBlt(0,0,rect.Width(),rect.Height(),&dcCompatible,0,0,bmp.bmWidth,bmp.bmHeight,SRCCOPY);//放缩全屏显示
-	*/
 	return TRUE;//这一步不能忘记，不是默认的return
 	//return CDialog::OnEraseBkgnd(pDC);
 }
 
-
+//输入框背景颜色 字体颜色
 HBRUSH CLOGIN::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
+
 	HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
-
-	// TODO:  在此更改 DC 的任何特性
-	if(nCtlColor == CTLCOLOR_DLG || nCtlColor == CTLCOLOR_BTN || nCtlColor ==  CTLCOLOR_STATIC)//设置窗口背景透明效果，字体颜色
-
-	{   
-		pDC->SetBkMode(TRANSPARENT);     //透明
-		pDC->SetTextColor(RGB(0,0,0));//静态文本框字体颜色
-// 		CFont * cFont=new CFont;  
-// 		cFont->CreateFont(8,0,0,0,FW_SEMIBOLD,FALSE,FALSE,0,  ANSI_CHARSET,OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY, DEFAULT_PITCH&FF_SWISS,"Arial"); 
-// 		pWnd->SetFont(cFont);
-
-	}   
-	// TODO: Return a different brush if the default is not desired
-
-	
+	if ((pWnd->GetDlgCtrlID() == IDC_USERNAME) && (nCtlColor == CTLCOLOR_STATIC))
+	{
+		pDC->SetBkColor(m_TextColor);
+		pDC->SetTextColor(m_EditColor);
+		hbr = (HBRUSH)m_brMine;
+		return m_brMine;
+	}
+	else
+	{
+		hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+		return hbr;
+	}
 	// TODO:  如果默认的不是所需画笔，则返回另一个画笔
 	return   HBRUSH(GetStockObject(HOLLOW_BRUSH));
 	//return hbr;
@@ -146,4 +147,69 @@ BOOL CLOGIN::PreTranslateMessage(MSG* pMsg)
 		}
 	}
 	return CDialog::PreTranslateMessage(pMsg);
+}
+//button 键样式
+void CLOGIN::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct) 
+{
+	CDC dc;
+	dc.Attach(lpDrawItemStruct->hDC);//得到绘制的设备环境CDC
+	VERIFY(lpDrawItemStruct->CtlType == ODT_BUTTON);
+	//得当Button上文字,这里的步骤是:1,先得到在资源里编辑的按钮的文字,
+	//然后将此文字重新绘制到按钮上,
+	//同时将此文字的背景色设为透明,这样,按钮上仅会显示文字
+	const int bufSize = 512;
+	TCHAR buffer[bufSize];
+	GetWindowText(buffer, bufSize);
+	int size = strlen(buffer);//得到长度
+	dc.SetTextColor(m_TextColor);
+	DrawText(lpDrawItemStruct->hDC, buffer, size, &lpDrawItemStruct->rcItem, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_TABSTOP);//绘制文字
+	SetBkMode(lpDrawItemStruct->hDC, TRANSPARENT);//透明
+	if (lpDrawItemStruct->itemState&ODS_SELECTED)//当按下按钮时的处理
+	{////重绘整个控制
+		CBrush brush(m_DownColor);
+		dc.FillRect(&(lpDrawItemStruct->rcItem), &brush);//利用画刷brush，填充矩形框
+		//因为这里进行了重绘,所以文字也要重绘
+		DrawText(lpDrawItemStruct->hDC, buffer, size, &lpDrawItemStruct->rcItem, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_TABSTOP);
+		SetBkMode(lpDrawItemStruct->hDC, TRANSPARENT);
+	}
+	else//当按钮不操作或者弹起时
+	{
+		CBrush brush(m_UpColor);
+		dc.FillRect(&(lpDrawItemStruct->rcItem), &brush);//
+		DrawText(lpDrawItemStruct->hDC, buffer, size, &lpDrawItemStruct->rcItem, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_TABSTOP);
+		SetBkMode(lpDrawItemStruct->hDC, TRANSPARENT);
+	}
+	if ((lpDrawItemStruct->itemState&ODS_SELECTED) && (lpDrawItemStruct->itemAction &(ODA_SELECT | ODA_DRAWENTIRE)))
+	{//选中了本控件,高亮边框
+		COLORREF fc = RGB(255 - GetRValue(m_UpColor), 255 - GetGValue(m_UpColor), 255 - GetBValue(m_UpColor));
+		CBrush brush(fc);
+		dc.FrameRect(&(lpDrawItemStruct->rcItem), &brush);//用画刷brush，填充矩形边框
+	}
+	if (!(lpDrawItemStruct->itemState &ODS_SELECTED) && (lpDrawItemStruct->itemAction & ODA_SELECT))
+	{
+		CBrush brush(m_UpColor); //控制的选中状态结束,去掉边框
+		dc.FrameRect(&lpDrawItemStruct->rcItem, &brush);//}
+		dc.Detach();
+	}
+}
+//填充默认数据
+BOOL CLOGIN::OnInitDialog()
+{
+	CDialog::OnInitDialog();
+
+	// TODO:  在此添加额外的初始化
+	//获得EDIT
+	CEdit* pBoxOne;
+	pBoxOne = (CEdit*)GetDlgItem(IDC_USERNAME);
+	//输入框提示字赋值
+	pBoxOne->SetWindowText(_T("请输入账号"));
+
+	//颜色赋值
+	m_DownColor = RGB(122, 103, 238);//按钮色
+	m_UpColor = RGB(106, 90, 238);   //浅紫色
+	m_TextColor = RGB(248, 248, 255);//白色
+	m_EditColor = RGB(10, 10, 10);   //输入文字
+	m_brMine.CreateSolidBrush(m_TextColor); //白底黑字
+	return TRUE;  // return TRUE unless you set the focus to a control
+				  // 异常: OCX 属性页应返回 FALSE
 }

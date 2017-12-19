@@ -48,6 +48,12 @@
     <ClInclude Include="MsgWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ListCtrlCl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HeaderCtrlCl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SM.cpp">
@@ -68,6 +74,12 @@
     <ClCompile Include="MsgWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="ListCtrlCl.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HeaderCtrlCl.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SM.rc">
@@ -85,6 +97,9 @@
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="res\CBTN.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="C:\Users\Administrator\Desktop\bg.BMP">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

@@ -107,6 +107,8 @@
     <None Include="res\SM.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="HeaderCtrlCl.h" />
+    <ClInclude Include="ListCtrlCl.h" />
     <ClInclude Include="LOGIN.h" />
     <ClInclude Include="MsgWindow.h" />
     <ClInclude Include="Resource.h" />
@@ -117,6 +119,8 @@
     <ClInclude Include="WininetHttp.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="HeaderCtrlCl.cpp" />
+    <ClCompile Include="ListCtrlCl.cpp" />
     <ClCompile Include="LOGIN.cpp" />
     <ClCompile Include="MsgWindow.cpp" />
     <ClCompile Include="SM.cpp" />
@@ -134,6 +138,7 @@
     <Image Include="..\..\MiniNews\MiniNews\Res\Skin_QQ.bmp" />
     <Image Include="..\..\MiniNews\MiniNews\Res\Skin_WangWang.bmp" />
     <Image Include="..\..\MiniNews\MiniNews\Res\Skin_XunLei.bmp" />
+    <Image Include="C:\Users\Administrator\Desktop\bg.BMP" />
     <Image Include="res\CBTN.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

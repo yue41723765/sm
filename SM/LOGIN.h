@@ -1,6 +1,6 @@
 #pragma once
 #include "afxwin.h"
-
+#include "afxbutton.h"
 
 // CLOGIN 对话框
 
@@ -18,6 +18,7 @@ public:
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 	DECLARE_MESSAGE_MAP()
+	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
 public:
 
 	
@@ -26,8 +27,12 @@ public:
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	CString	m_password;
 	CString	m_username;
-
+	CBrush m_Brush;
 	afx_msg void OnEnChangePassword();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	CButton b_login;
+	CMFCButton b_login;
+	CBrush m_brMine;
+	//三种颜色分别为文字，Button Down的背景颜色，Button Up的背景颜色
+	COLORREF m_TextColor, m_DownColor, m_UpColor,m_EditColor;
+	virtual BOOL OnInitDialog();
 };

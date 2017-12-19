@@ -25,12 +25,11 @@
 NOTIFYICONDATA NotifyIcon;
 int sort_column; // 记录点击的列
 bool method; // 记录比较方法
-//MsgWindow NewsWindow;
-BOOL InitNews();
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 int m_minute = 0;//每个用户的提醒分钟
 int time_type = 1;//间隔分类
 int record=0;//记录上一次的时间
+int nSize = 0;//记录推送条目数量
 
 
 
@@ -120,7 +119,6 @@ BEGIN_MESSAGE_MAP(CSMDlg, CDialogEx)
 	ON_MESSAGE(WM_SHOWTASK, OnShowTask) //关闭变为最小化
 	ON_BN_CLICKED(IDNO, &CSMDlg::OnClickedIdno) //注销键
 	ON_WM_TIMER() //定时器
-
 END_MESSAGE_MAP()
 
 
@@ -168,9 +166,24 @@ BOOL CSMDlg::OnInitDialog()
 	string name = str.GetBuffer(0);
 	url = "http://117.131.227.94:8045/bpmx/perfRemind/perfRemind/perfRemindinfo/getTaskForExe.ht?username=" +name+ "&password=" + password.GetBuffer(0);
 	//这个是通知列表获取数据
+	DWORD dwStyle = m_list_port.GetExtendedStyle();
+	dwStyle |= LVS_EX_FULLROWSELECT;
+	dwStyle |= LVS_EX_GRIDLINES;
+	m_list_port.SetExtendedStyle(dwStyle);
+	m_list_port.InsertColumn(0, _T("编号"), LVCFMT_LEFT, 50);
+	m_list_port.InsertColumn(1, _T("标题"), LVCFMT_LEFT, 150);
+	m_list_port.InsertColumn(2, _T("内容"), LVCFMT_LEFT, 366);
+	m_list_port.InsertColumn(3, _T("类型"), LVCFMT_LEFT, 150);
+	m_list_port.SetRowHeigt(35);               //设置行高度
+	m_list_port.SetHeaderHeight(1.3);          //设置头部高度
+	m_list_port.SetHeaderFontHW(16, 0);         //设置头部字体高度,和宽度,0表示缺省，自适应 
+	m_list_port.SetHeaderTextColor(RGB(0, 0, 0)); //设置头部字体颜色
+	m_list_port.SetHeaderBKColor(255, 255, 255, 0); //设置头部背景色
+	m_list_port.SetFontHW(14, 0);                 //设置字体高度，和宽度,0表示缺省宽度
 	initData();
 	//截取账号最后一位数 做定时
 	m_name = name.substr(name.length() - 1, name.length()).c_str();
+	setData();
 	//提醒时间
 	m_chosecom.InsertString(0, "间隔一小时");
 	m_chosecom.InsertString(1,"间隔两小时");
@@ -182,10 +195,12 @@ BOOL CSMDlg::OnInitDialog()
 
 	CSMDlg::SetTimer(1, 1000*60, NULL);
 
+
+
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
-void setTime() 
+void CSMDlg::setData()
 {
 	if (m_name=="0")
 	{
@@ -261,13 +276,6 @@ wchar_t* changeString(string word)
 void CSMDlg::initData()
 {
 
-	DWORD dwStyle = m_list_port.GetExtendedStyle();
-	dwStyle |= LVS_EX_FULLROWSELECT;
-	dwStyle |= LVS_EX_GRIDLINES;
-	m_list_port.SetExtendedStyle(dwStyle);
-	m_list_port.InsertColumn(0, _T("标题"), LVCFMT_LEFT, 100);
-	m_list_port.InsertColumn(1, _T("内容"), LVCFMT_LEFT, 250);
-	m_list_port.InsertColumn(2, _T("类型"), LVCFMT_LEFT, 160);
 	WininetHttp http;
 	string strJsonInfo = http.RequestJsonInfo(url);
 	string strMessInfo= http.ParseJsonMess(strJsonInfo);
@@ -277,7 +285,7 @@ void CSMDlg::initData()
 	{
 		return;
 	}
-	int nSize = value.size();
+	nSize = value.size();
 	for (size_t i = 0; i<nSize; i++)
 	{
 		m_list_port.InsertItem(i, _T("yiyi"));
@@ -285,18 +293,29 @@ void CSMDlg::initData()
 	for (size_t i = 0; i < nSize; i++)
 	{
 		//文字转换 配合上边方法 部分代码写在上边的方法里会乱码
+		CString number;
+		number.Format(_T("%d"), i + 1);
 		LPCTSTR titLp, conLp, takeLp;
 		string tit = value[i]["title"].asString();
 		string con = value[i]["content"].asString();
 		string take = value[i]["takeType"].asString();
+		if (i%2==0)
+		{
+			for (size_t j = 0; j< 4; j++)
+			{
+				m_list_port.SetItemColor(j, i, RGB(222, 240, 216));  //设置单元格字体颜色
+			}
+		}
+		
 		USES_CONVERSION;
 		titLp = W2CT(changeString(tit));
 		conLp = W2CT(changeString(con));
 		takeLp = W2CT(changeString(take));
 		//列表填充
-		m_list_port.SetItemText(i, 0, titLp);
-		m_list_port.SetItemText(i, 1, conLp);
-		m_list_port.SetItemText(i, 2, takeLp);
+		m_list_port.SetItemText(i, 0, number);
+		m_list_port.SetItemText(i, 1, titLp);
+		m_list_port.SetItemText(i, 2, conLp);
+		m_list_port.SetItemText(i, 3, takeLp);
 	}
 }
 //最小化三连杀 从托盘打开的后续工作
@@ -358,7 +377,7 @@ void CSMDlg::DeleteTray()
 	 nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
 	 nid.uCallbackMessage = WM_SHOWTASK;//自定义的消息名称 
 	 nid.hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME));
-	 strcpy(nid.szTip, "程序名称");    //信息提示条 
+	 strcpy(nid.szTip, "通知");    //信息提示条 
 	 Shell_NotifyIcon(NIM_ADD, &nid);    //在托盘区添加图标 
 	 ShowWindow(SW_HIDE);    //隐藏主窗口
  }
@@ -379,7 +398,11 @@ void CSMDlg::OnSysCommand(UINT nID, LPARAM lParam)
 		CDialogEx::OnSysCommand(nID, lParam);
 	}
 }
-
+void  CSMDlg::ShowDialog()
+{
+	GetActiveWindow()->ShowWindow(SW_SHOW);//简单的显示主窗口完事儿 
+	//DeleteTray();
+}
 // 如果向对话框添加最小化按钮，则需要下面的代码
 //  来绘制该图标。对于使用文档/视图模型的 MFC 应用程序，
 //  这将由框架自动完成。
@@ -438,6 +461,15 @@ void CSMDlg::OnSelchangeCombo1()
 		time_type = 4; break;
 	case 3:
 	{
+		/*
+		MsgWindow* p_MsgWindow = new MsgWindow;
+		p_MsgWindow->SetSkin(MAKEINTRESOURCE(IDB_SKIN_XUNLEI));
+		if (!p_MsgWindow->Create(m_hWnd, "通知"))
+		{
+			AfxMessageBox("推送失败，请打开窗口!"); return;
+		}
+		p_MsgWindow->SetMsg("您有新的任务", "共0条", "http://www.baidu.com");
+		p_MsgWindow->Show();*/
 		time_type = 0;
 		break;
 	}
@@ -483,13 +515,16 @@ void CSMDlg::OnTimer(UINT_PTR nIDEvent)
 			if (hour - record >= time_type)
 			{
 				record = hour;
+				initData();
 				MsgWindow* p_MsgWindow = new MsgWindow;
 				p_MsgWindow->SetSkin(MAKEINTRESOURCE(IDB_SKIN_XUNLEI));
+				CString num;
+				num.Format(_T("%d"), nSize);
 				if (!p_MsgWindow->Create(m_hWnd, "通知"))
 				{
 					AfxMessageBox("推送失败，请打开窗口!"); return;
 				}
-				p_MsgWindow->SetMsg("您有新的任务", "共N条", "http://www.baidu.com");
+				p_MsgWindow->SetMsg("您有新的任务", "共"+ num +"条", "http://www.baidu.com");
 				p_MsgWindow->Show();
 			}
 		}
@@ -500,3 +535,4 @@ void CSMDlg::OnTimer(UINT_PTR nIDEvent)
 	}
 	CDialogEx::OnTimer(nIDEvent);
 }
+

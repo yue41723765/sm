@@ -2,7 +2,7 @@
 #define WM_CONTROLCLICK		WM_APP+106
 #define TIMER_WINDOW_DELAY		10085
 #define TIMER_WINDOW_FADEOUT	10086
-#define DELAY_TIME				2000
+#define DELAY_TIME				1000*60*3
 
 class MsgWindow : public CWnd
 {
