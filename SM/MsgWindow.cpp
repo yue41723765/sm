@@ -437,10 +437,7 @@ LRESULT MsgWindow::OnControlClick(WPARAM wParam, LPARAM lParam)
 	}
 	else {
 		if (m_strURL != _T("")) {
-			//::ShellExecute(NULL, _T("Open"), m_strURL, NULL, NULL, SW_SHOW);
-			HWND hWnd = ::FindWindowA(NULL,_T("主界面")); //获取需要软件的窗口
-			int ret = ::SendMessageA(hWnd, SW_SHOW, 0, 0); //关闭软件
-			//PostMessage(WM_CLOSE, NULL, NULL);
+			::ShellExecute(NULL, _T("Open"), m_strURL, NULL, NULL, SW_SHOW);
 		}
 		if (m_bClickAutoClose) {
 			PostMessage(WM_CLOSE, NULL, NULL);

@@ -108,6 +108,8 @@ void CSMDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST1, m_list_port);
 	DDX_Control(pDX, IDC_COMBO1, m_chosecom);
+	DDX_Control(pDX, IDOK, OKButton);
+	DDX_Control(pDX, IDNO, CancelBtn);
 }
 
 BEGIN_MESSAGE_MAP(CSMDlg, CDialogEx)
@@ -125,6 +127,7 @@ END_MESSAGE_MAP()
 // CSMDlg 消息处理程序
 CString m_name;
 string url;
+string loginUrl;
 BOOL CSMDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
@@ -165,6 +168,7 @@ BOOL CSMDlg::OnInitDialog()
 	GetProfileString("windows", "password", "", password.GetBuffer(254), 1024);
 	string name = str.GetBuffer(0);
 	url = "http://117.131.227.94:8045/bpmx/perfRemind/perfRemind/perfRemindinfo/getTaskForExe.ht?username=" +name+ "&password=" + password.GetBuffer(0);
+	loginUrl= "http://117.131.227.94:8045/bpmx/login.ht?username="+name+ "&password="+password.GetBuffer(0);
 	//这个是通知列表获取数据
 	DWORD dwStyle = m_list_port.GetExtendedStyle();
 	dwStyle |= LVS_EX_FULLROWSELECT;
@@ -175,7 +179,7 @@ BOOL CSMDlg::OnInitDialog()
 	m_list_port.InsertColumn(2, _T("内容"), LVCFMT_LEFT, 366);
 	m_list_port.InsertColumn(3, _T("类型"), LVCFMT_LEFT, 150);
 	m_list_port.SetRowHeigt(35);               //设置行高度
-	m_list_port.SetHeaderHeight(1.3);          //设置头部高度
+	m_list_port.SetHeaderHeight(1.4);          //设置头部高度
 	m_list_port.SetHeaderFontHW(16, 0);         //设置头部字体高度,和宽度,0表示缺省，自适应 
 	m_list_port.SetHeaderTextColor(RGB(0, 0, 0)); //设置头部字体颜色
 	m_list_port.SetHeaderBKColor(255, 255, 255, 0); //设置头部背景色
@@ -196,7 +200,15 @@ BOOL CSMDlg::OnInitDialog()
 	CSMDlg::SetTimer(1, 1000*60, NULL);
 
 
-
+	
+	COLORREF okUpColor = RGB(65, 105, 225);
+	COLORREF okDownColor = RGB(70, 110, 225);
+	COLORREF okTextColor = RGB(255, 255, 255);
+	COLORREF celUpColor = RGB(220, 220, 220);
+	COLORREF celDownColor = RGB(221, 221, 221);
+	COLORREF celextColor = RGB(50, 50, 50);
+	OKButton.Init(okTextColor, okUpColor, okDownColor, okDownColor, okDownColor,"关闭软件");
+	CancelBtn.Init(celextColor, celUpColor, celDownColor,celDownColor, celDownColor,"注销软件");
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -461,15 +473,7 @@ void CSMDlg::OnSelchangeCombo1()
 		time_type = 4; break;
 	case 3:
 	{
-		/*
-		MsgWindow* p_MsgWindow = new MsgWindow;
-		p_MsgWindow->SetSkin(MAKEINTRESOURCE(IDB_SKIN_XUNLEI));
-		if (!p_MsgWindow->Create(m_hWnd, "通知"))
-		{
-			AfxMessageBox("推送失败，请打开窗口!"); return;
-		}
-		p_MsgWindow->SetMsg("您有新的任务", "共0条", "http://www.baidu.com");
-		p_MsgWindow->Show();*/
+
 		time_type = 0;
 		break;
 	}
@@ -524,7 +528,7 @@ void CSMDlg::OnTimer(UINT_PTR nIDEvent)
 				{
 					AfxMessageBox("推送失败，请打开窗口!"); return;
 				}
-				p_MsgWindow->SetMsg("您有新的任务", "共"+ num +"条", "http://www.baidu.com");
+				p_MsgWindow->SetMsg("您有新的任务", "共"+ num +"条", loginUrl.c_str());
 				p_MsgWindow->Show();
 			}
 		}

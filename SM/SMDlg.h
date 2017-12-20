@@ -8,6 +8,8 @@
 #include <iostream>
 #include "resource.h"
 #include "ListCtrlCl.h"
+#include "afxbutton.h"
+#include "MyButton.h"
 #define MAX_PATH 260
 using namespace std;
 
@@ -45,5 +47,7 @@ public:
 	afx_msg void OnSelchangeCombo1();
 	afx_msg void OnClickedIdno();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	CMyButton OKButton;
+	CMyButton CancelBtn;
 };
 

@@ -111,6 +111,7 @@
     <ClInclude Include="ListCtrlCl.h" />
     <ClInclude Include="LOGIN.h" />
     <ClInclude Include="MsgWindow.h" />
+    <ClInclude Include="MyButton.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SM.h" />
     <ClInclude Include="SMDlg.h" />
@@ -123,6 +124,7 @@
     <ClCompile Include="ListCtrlCl.cpp" />
     <ClCompile Include="LOGIN.cpp" />
     <ClCompile Include="MsgWindow.cpp" />
+    <ClCompile Include="MyButton.cpp" />
     <ClCompile Include="SM.cpp" />
     <ClCompile Include="SMDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
