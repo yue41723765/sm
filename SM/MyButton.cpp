@@ -71,21 +71,7 @@ void CMyButton::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	dc.Attach(lpDrawItemStruct->hDC);       //°´Å¥¿Ø¼þDC    
 
 	COLORREF clrBK = RGB(255, 255, 255);
-	/*
-	switch (m_nCtrlState)
-	{
-	case CTRL_NOFOCUS:
-		clrBK = m_clrBKUnfocus;
-		break;
-	case CTRL_FOCUS:
-		clrBK = m_clrBKFocus;
-		break;
-	case CTRL_SELECTED:
-		clrBK = m_clrBKSelected;
-		break;
-	default:
-		break;
-	}*/
+
 
 	if (IsWindowEnabled() == FALSE)
 	{

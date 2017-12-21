@@ -10,6 +10,8 @@
 #include "ListCtrlCl.h"
 #include "afxbutton.h"
 #include "MyButton.h"
+#include "PicButton.h"
+#include "WEComboBox.h"
 #define MAX_PATH 260
 using namespace std;
 
@@ -43,11 +45,12 @@ public:
 	void ShowDialog();
 	afx_msg void ClistDlg(NMHDR *pNMHDR, LRESULT *pResult);
 	CListCtrlCl m_list_port;
-	CComboBox m_chosecom;
+	//CComboBox
+	CWEComboBox m_chosecom;
 	afx_msg void OnSelchangeCombo1();
 	afx_msg void OnClickedIdno();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
-	CMyButton OKButton;
-	CMyButton CancelBtn;
+	CPicButton OKButton;
+	CPicButton CancelBtn;
 };
 

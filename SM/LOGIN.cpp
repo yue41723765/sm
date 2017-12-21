@@ -36,6 +36,8 @@ void CLOGIN::DoDataExchange(CDataExchange* pDX)
 	//DDX_Control(pDX, IDC_LOGIN, b_login);
 	GetDlgItem(IDC_LOGIN)->SetWindowTextA(_T("强制更改"));
 	DDX_Control(pDX, IDC_LOGIN, b_login);
+	DDX_Control(pDX, IDC_USERNAME, m_user);
+	DDX_Control(pDX, IDC_PASSWORD, m_pass);
 }
 
 
@@ -167,6 +169,14 @@ BOOL CLOGIN::OnInitDialog()
 	m_EditColor = RGB(10, 10, 10);   //输入文字
 	m_brMine.CreateSolidBrush(m_TextColor); //白底黑字
 	b_login.Init(m_TextColor, m_UpColor, m_DownColor, m_DownColor, m_DownColor, "登   录");
+
+	m_user.Enable(true);
+	m_user.SetClrBorder(m_DownColor, m_TextColor);
+	m_user.SetClrText(RGB(10, 10, 10));  //设置字体颜色
+	m_user.SetText("请输入账号密码");
+	m_pass.Enable(true);
+	m_pass.SetClrBorder(m_DownColor, m_TextColor);
+	m_pass.SetClrText(RGB(10, 10, 10));  //设置字体颜色
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // 异常: OCX 属性页应返回 FALSE
 }

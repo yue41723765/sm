@@ -57,6 +57,15 @@
     <ClInclude Include="MyButton.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="PicButton.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TransParentEdit.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="WEComboBox.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SM.cpp">
@@ -86,6 +95,15 @@
     <ClCompile Include="MyButton.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="PicButton.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TransParentEdit.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="WEComboBox.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SM.rc">
@@ -106,6 +124,27 @@
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="C:\Users\Administrator\Desktop\bg.BMP">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\..\mininews\mininews\res\bitmap3.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="C:\Users\Administrator\Desktop\泰安项目文件\blue_off.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="C:\Users\Administrator\Desktop\泰安项目文件\blue_on.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="C:\Users\Administrator\Desktop\泰安项目文件\white_off.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="C:\Users\Administrator\Desktop\泰安项目文件\white_on.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="C:\Users\Administrator\Desktop\btn_blue_off.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\combox.bmp">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

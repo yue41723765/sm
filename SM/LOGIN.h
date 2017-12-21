@@ -2,6 +2,8 @@
 #include "afxwin.h"
 #include "afxbutton.h"
 #include "MyButton.h"
+#include "PicButton.h"
+#include "TransparentEdit.h"
 // CLOGIN 对话框
 
 class CLOGIN : public CDialog
@@ -30,9 +32,12 @@ public:
 	CBrush m_Brush;
 	afx_msg void OnEnChangePassword();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	//CMyButton
 	CMyButton b_login;
 	CBrush m_brMine;
 	//三种颜色分别为文字，Button Down的背景颜色，Button Up的背景颜色
 	COLORREF m_TextColor, m_DownColor, m_UpColor,m_EditColor;
 	virtual BOOL OnInitDialog();
+	CTransparentEdit m_user;
+	CTransparentEdit m_pass;
 };

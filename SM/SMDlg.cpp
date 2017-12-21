@@ -110,6 +110,7 @@ void CSMDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO1, m_chosecom);
 	DDX_Control(pDX, IDOK, OKButton);
 	DDX_Control(pDX, IDNO, CancelBtn);
+
 }
 
 BEGIN_MESSAGE_MAP(CSMDlg, CDialogEx)
@@ -174,10 +175,10 @@ BOOL CSMDlg::OnInitDialog()
 	dwStyle |= LVS_EX_FULLROWSELECT;
 	dwStyle |= LVS_EX_GRIDLINES;
 	m_list_port.SetExtendedStyle(dwStyle);
-	m_list_port.InsertColumn(0, _T("编号"), LVCFMT_LEFT, 50);
+	m_list_port.InsertColumn(0, _T("编号"), LVCFMT_LEFT, 48);
 	m_list_port.InsertColumn(1, _T("标题"), LVCFMT_LEFT, 150);
-	m_list_port.InsertColumn(2, _T("内容"), LVCFMT_LEFT, 366);
-	m_list_port.InsertColumn(3, _T("类型"), LVCFMT_LEFT, 150);
+	m_list_port.InsertColumn(2, _T("内容"), LVCFMT_LEFT, 365);
+	m_list_port.InsertColumn(3, _T("类型"), LVCFMT_LEFT, 143);
 	m_list_port.SetRowHeigt(35);               //设置行高度
 	m_list_port.SetHeaderHeight(1.4);          //设置头部高度
 	m_list_port.SetHeaderFontHW(16, 0);         //设置头部字体高度,和宽度,0表示缺省，自适应 
@@ -189,7 +190,7 @@ BOOL CSMDlg::OnInitDialog()
 	m_name = name.substr(name.length() - 1, name.length()).c_str();
 	setData();
 	//提醒时间
-	m_chosecom.InsertString(0, "间隔一小时");
+	m_chosecom.InsertString(0,"间隔一小时");
 	m_chosecom.InsertString(1,"间隔两小时");
 	m_chosecom.InsertString(2,"间隔四小时");
 	m_chosecom.InsertString(3,"不提醒");
@@ -207,8 +208,11 @@ BOOL CSMDlg::OnInitDialog()
 	COLORREF celUpColor = RGB(220, 220, 220);
 	COLORREF celDownColor = RGB(221, 221, 221);
 	COLORREF celextColor = RGB(50, 50, 50);
-	OKButton.Init(okTextColor, okUpColor, okDownColor, okDownColor, okDownColor,"关闭软件");
-	CancelBtn.Init(celextColor, celUpColor, celDownColor,celDownColor, celDownColor,"注销软件");
+	//OKButton.Init(okTextColor, okUpColor, okDownColor, okDownColor, okDownColor,"关闭软件");
+	//CancelBtn.Init(celextColor, celUpColor, celDownColor,celDownColor, celDownColor,"注销软件");
+	OKButton.SetBitmapId(IDB_BULE_OFF, IDB_BULE_OFF, IDB_BULE_ON, IDB_BULE_OFF, "关闭软件", okTextColor);
+	CancelBtn.SetBitmapId(IDB_WHITE_OFF, IDB_WHITE_OFF, IDB_WHITE_ON, IDB_WHITE_OFF, "注销软件", celextColor);
+
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -300,7 +304,7 @@ void CSMDlg::initData()
 	nSize = value.size();
 	for (size_t i = 0; i<nSize; i++)
 	{
-		m_list_port.InsertItem(i, _T("yiyi"));
+		m_list_port.InsertItem(i, _T(""));
 	}
 	for (size_t i = 0; i < nSize; i++)
 	{

@@ -11,6 +11,7 @@ class CMyButton : public CButton
 	protected:
 		DECLARE_MESSAGE_MAP()
 	public:
+		//加入文字颜色，背景颜色，按下颜色，无动作颜色， 按钮文字
 		void Init(COLORREF clrFont, COLORREF clrBKFocus, COLORREF clrBKUnfocus, COLORREF clrBKSelected, COLORREF clrBKDisable, CString  clrText);
 		void SetFont(CFont* pFont, BOOL bRedraw = TRUE);
 
