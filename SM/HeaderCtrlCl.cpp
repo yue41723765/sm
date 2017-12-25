@@ -10,7 +10,7 @@ CHeaderCtrlCl::CHeaderCtrlCl()
 	, m_B(235)
 	, m_Gradient(8)
 {
-	m_Format = "";
+	m_Format = "1";
 	m_Height = 1;
 	m_fontHeight = 15;
 	m_fontWith = 0;
@@ -64,10 +64,10 @@ void CHeaderCtrlCl::OnPaint()
 		CFont nFont, *nOldFont;
 		//dc.SetTextColor(RGB(250,50,50)); 
 		dc.SetTextColor(m_color);
-		nFont.CreateFont(m_fontHeight, m_fontWith, 0, 0, 0, FALSE, FALSE, 0, 0, 0, 0, 0, 0, _TEXT("宋体"));//创建字体 
+		nFont.CreateFont(m_fontHeight, m_fontWith, 0, 0, FW_BOLD, FALSE, FALSE, 0, 0, 0, 0, 0, 0, _TEXT("宋体"));//创建字体 
 		nOldFont = dc.SelectObject(&nFont);
 
-		UINT nFormat = 1;
+		UINT nFormat = DT_CENTER;
 		if (m_Format[i] == '0')
 		{
 			nFormat = DT_LEFT;
@@ -87,7 +87,7 @@ void CHeaderCtrlCl::OnPaint()
 		int ofst = 0;
 		ofst = tRect.Height() - metric.tmHeight;
 		tRect.OffsetRect(0, ofst / 2);
-		dc.DrawText(m_HChar[i], &tRect, nFormat);
+		dc.DrawText(m_HChar[i], &tRect, DT_CENTER);
 		dc.SelectObject(nOldFont);
 		nFont.DeleteObject(); //释放字体 
 	}

@@ -19,9 +19,6 @@
     <None Include="res\SM.rc2">
       <Filter>资源文件</Filter>
     </None>
-    <None Include="res\SM.ico">
-      <Filter>资源文件</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SM.h">
@@ -111,12 +108,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\MiniNews\MiniNews\Res\Skin_QQ.bmp">
-      <Filter>资源文件</Filter>
-    </Image>
-    <Image Include="..\..\MiniNews\MiniNews\Res\Skin_WangWang.bmp">
-      <Filter>资源文件</Filter>
-    </Image>
     <Image Include="..\..\MiniNews\MiniNews\Res\Skin_XunLei.bmp">
       <Filter>资源文件</Filter>
     </Image>
@@ -124,9 +115,6 @@
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="C:\Users\Administrator\Desktop\bg.BMP">
-      <Filter>资源文件</Filter>
-    </Image>
-    <Image Include="..\..\mininews\mininews\res\bitmap3.bmp">
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="C:\Users\Administrator\Desktop\泰安项目文件\blue_off.bmp">
@@ -141,10 +129,28 @@
     <Image Include="C:\Users\Administrator\Desktop\泰安项目文件\white_on.bmp">
       <Filter>资源文件</Filter>
     </Image>
-    <Image Include="C:\Users\Administrator\Desktop\btn_blue_off.png">
+    <Image Include="res\combox.bmp">
       <Filter>资源文件</Filter>
     </Image>
-    <Image Include="res\combox.bmp">
+    <Image Include="res\SMICO.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\Skin_XunLei.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\bg.BMP">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\blue_off.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\blue_on.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\white_off.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\white_on.bmp">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

@@ -17,7 +17,7 @@ CListCtrlCl::CListCtrlCl()
 	, m_fontHeight(12)
 	, m_fontWith(0)
 {
-	m_color = RGB(0, 0, 0);
+	m_color = RGB(10, 10, 10);
 }
 
 CListCtrlCl::~CListCtrlCl()

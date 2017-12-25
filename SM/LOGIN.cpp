@@ -110,11 +110,12 @@ HBRUSH CLOGIN::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 	{
 		pDC->SetBkColor(m_TextColor);
 		pDC->SetTextColor(m_EditColor);
-		hbr = (HBRUSH)m_brMine;
-		return m_brMine;
+		//hbr = (HBRUSH)m_brMine;
+		//return m_brMine;
 	}
 	else
 	{
+		
 		hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
 		return hbr;
 	}
@@ -157,10 +158,11 @@ BOOL CLOGIN::OnInitDialog()
 
 	// TODO:  在此添加额外的初始化
 	//获得EDIT
-	CEdit* pBoxOne;
-	pBoxOne = (CEdit*)GetDlgItem(IDC_USERNAME);
-	//输入框提示字赋值
-	pBoxOne->SetWindowText(_T("请输入账号"));
+	LPCSTR str = "TestStr";
+	USES_CONVERSION;
+	LPCWSTR pwcStr = A2CW(str);
+	m_user.SetCueBanner(pwcStr,TRUE);
+	m_pass.SetCueBanner(pwcStr, FALSE);
 
 	//颜色赋值
 	m_DownColor = RGB(122, 103, 238);//按钮色
@@ -173,10 +175,12 @@ BOOL CLOGIN::OnInitDialog()
 	m_user.Enable(true);
 	m_user.SetClrBorder(m_DownColor, m_TextColor);
 	m_user.SetClrText(RGB(10, 10, 10));  //设置字体颜色
-	m_user.SetText("请输入账号密码");
+	//m_user.SetText("请输入账号密码");
 	m_pass.Enable(true);
 	m_pass.SetClrBorder(m_DownColor, m_TextColor);
 	m_pass.SetClrText(RGB(10, 10, 10));  //设置字体颜色
+
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // 异常: OCX 属性页应返回 FALSE
 }

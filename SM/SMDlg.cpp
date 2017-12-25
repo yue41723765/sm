@@ -168,19 +168,20 @@ BOOL CSMDlg::OnInitDialog()
 	GetProfileString("windows", "name", "", str.GetBuffer(254), 1024);
 	GetProfileString("windows", "password", "", password.GetBuffer(254), 1024);
 	string name = str.GetBuffer(0);
-	url = "http://117.131.227.94:8045/bpmx/perfRemind/perfRemind/perfRemindinfo/getTaskForExe.ht?username=" +name+ "&password=" + password.GetBuffer(0);
+	url = "http://117.131.227.94:8045/bpmx/perfRemind/perfRemind/perfRemindinfo/getRemindsJsonArr.ht?username=" +name+ "&password=" + password.GetBuffer(0);
 	loginUrl= "http://117.131.227.94:8045/bpmx/login.ht?username="+name+ "&password="+password.GetBuffer(0);
 	//这个是通知列表获取数据
 	DWORD dwStyle = m_list_port.GetExtendedStyle();
 	dwStyle |= LVS_EX_FULLROWSELECT;
 	dwStyle |= LVS_EX_GRIDLINES;
 	m_list_port.SetExtendedStyle(dwStyle);
-	m_list_port.InsertColumn(0, _T("编号"), LVCFMT_LEFT, 48);
+	m_list_port.InsertColumn(0, _T("编号"), LVCFMT_LEFT, 50);
 	m_list_port.InsertColumn(1, _T("标题"), LVCFMT_LEFT, 150);
-	m_list_port.InsertColumn(2, _T("内容"), LVCFMT_LEFT, 365);
-	m_list_port.InsertColumn(3, _T("类型"), LVCFMT_LEFT, 143);
+	m_list_port.InsertColumn(2, _T("内容"), LVCFMT_LEFT, 450);
+	m_list_port.InsertColumn(3, _T("类型"), LVCFMT_LEFT, 160);
+	m_list_port.InsertColumn(3, _T("用户"), LVCFMT_LEFT, 148);
 	m_list_port.SetRowHeigt(35);               //设置行高度
-	m_list_port.SetHeaderHeight(1.4);          //设置头部高度
+	m_list_port.SetHeaderHeight(1.6);          //设置头部高度
 	m_list_port.SetHeaderFontHW(16, 0);         //设置头部字体高度,和宽度,0表示缺省，自适应 
 	m_list_port.SetHeaderTextColor(RGB(0, 0, 0)); //设置头部字体颜色
 	m_list_port.SetHeaderBKColor(255, 255, 255, 0); //设置头部背景色
@@ -188,7 +189,7 @@ BOOL CSMDlg::OnInitDialog()
 	initData();
 	//截取账号最后一位数 做定时
 	m_name = name.substr(name.length() - 1, name.length()).c_str();
-	setData();
+	setData(m_name);
 	//提醒时间
 	m_chosecom.InsertString(0,"间隔一小时");
 	m_chosecom.InsertString(1,"间隔两小时");
@@ -202,11 +203,11 @@ BOOL CSMDlg::OnInitDialog()
 
 
 	
-	COLORREF okUpColor = RGB(65, 105, 225);
-	COLORREF okDownColor = RGB(70, 110, 225);
+	//COLORREF okUpColor = RGB(65, 105, 225);
+	//COLORREF okDownColor = RGB(70, 110, 225);
 	COLORREF okTextColor = RGB(255, 255, 255);
-	COLORREF celUpColor = RGB(220, 220, 220);
-	COLORREF celDownColor = RGB(221, 221, 221);
+	//COLORREF celUpColor = RGB(220, 220, 220);
+	//COLORREF celDownColor = RGB(221, 221, 221);
 	COLORREF celextColor = RGB(50, 50, 50);
 	//OKButton.Init(okTextColor, okUpColor, okDownColor, okDownColor, okDownColor,"关闭软件");
 	//CancelBtn.Init(celextColor, celUpColor, celDownColor,celDownColor, celDownColor,"注销软件");
@@ -215,8 +216,8 @@ BOOL CSMDlg::OnInitDialog()
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
-
-void CSMDlg::setData()
+//根据用户得出分钟数
+void CSMDlg::setData(CString m_name)
 {
 	if (m_name=="0")
 	{
@@ -262,8 +263,6 @@ void CSMDlg::setData()
 	{
 		m_minute = 0;
 	}
-
-	
 }
 
 //解决中文转码问题  
@@ -291,7 +290,7 @@ wchar_t* changeString(string word)
 //这个是通知列表所有数据
 void CSMDlg::initData()
 {
-
+	m_list_port.DeleteAllItems();
 	WininetHttp http;
 	string strJsonInfo = http.RequestJsonInfo(url);
 	string strMessInfo= http.ParseJsonMess(strJsonInfo);
@@ -311,13 +310,14 @@ void CSMDlg::initData()
 		//文字转换 配合上边方法 部分代码写在上边的方法里会乱码
 		CString number;
 		number.Format(_T("%d"), i + 1);
-		LPCTSTR titLp, conLp, takeLp;
+		CString titLp, conLp, takeLp,nameLp;
 		string tit = value[i]["title"].asString();
 		string con = value[i]["content"].asString();
 		string take = value[i]["takeType"].asString();
+		string uName = value[i]["username"].asString();
 		if (i%2==0)
 		{
-			for (size_t j = 0; j< 4; j++)
+			for (size_t j = 0; j< 5; j++)
 			{
 				m_list_port.SetItemColor(j, i, RGB(222, 240, 216));  //设置单元格字体颜色
 			}
@@ -327,11 +327,13 @@ void CSMDlg::initData()
 		titLp = W2CT(changeString(tit));
 		conLp = W2CT(changeString(con));
 		takeLp = W2CT(changeString(take));
+		nameLp = W2CT(changeString(uName));
 		//列表填充
-		m_list_port.SetItemText(i, 0, number);
-		m_list_port.SetItemText(i, 1, titLp);
-		m_list_port.SetItemText(i, 2, conLp);
-		m_list_port.SetItemText(i, 3, takeLp);
+		m_list_port.SetItemText(i, 0, " " + number);
+		m_list_port.SetItemText(i, 1, " "+titLp);
+		m_list_port.SetItemText(i, 2, " " + conLp);
+		m_list_port.SetItemText(i, 3, " " + takeLp);
+		m_list_port.SetItemText(i, 4, " " + nameLp);
 	}
 }
 //最小化三连杀 从托盘打开的后续工作
@@ -450,8 +452,7 @@ void CSMDlg::OnPaint()
 	}
 }
 
-//当用户拖动最小化窗口时系统调用此函数取得光标
-//显示。
+//当用户拖动最小化窗口时系统调用此函数取得光标 显示
 HCURSOR CSMDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
@@ -477,8 +478,6 @@ void CSMDlg::OnSelchangeCombo1()
 		time_type = 4; break;
 	case 3:
 	{
-
-		time_type = 0;
 		break;
 	}
 		

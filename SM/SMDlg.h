@@ -40,7 +40,7 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 	
-	void setData();
+	void setData(CString m_name);
 public:
 	void ShowDialog();
 	afx_msg void ClistDlg(NMHDR *pNMHDR, LRESULT *pResult);

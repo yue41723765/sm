@@ -103,7 +103,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
-    <None Include="res\SM.ico" />
     <None Include="res\SM.rc2" />
   </ItemGroup>
   <ItemGroup>
@@ -143,18 +142,21 @@
     <ResourceCompile Include="SM.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\mininews\mininews\res\bitmap3.bmp" />
-    <Image Include="..\..\MiniNews\MiniNews\Res\Skin_QQ.bmp" />
-    <Image Include="..\..\MiniNews\MiniNews\Res\Skin_WangWang.bmp" />
     <Image Include="..\..\MiniNews\MiniNews\Res\Skin_XunLei.bmp" />
     <Image Include="C:\Users\Administrator\Desktop\bg.BMP" />
-    <Image Include="C:\Users\Administrator\Desktop\btn_blue_off.png" />
     <Image Include="C:\Users\Administrator\Desktop\泰安项目文件\blue_off.bmp" />
     <Image Include="C:\Users\Administrator\Desktop\泰安项目文件\blue_on.bmp" />
     <Image Include="C:\Users\Administrator\Desktop\泰安项目文件\white_off.bmp" />
     <Image Include="C:\Users\Administrator\Desktop\泰安项目文件\white_on.bmp" />
+    <Image Include="res\bg.BMP" />
+    <Image Include="res\blue_off.bmp" />
+    <Image Include="res\blue_on.bmp" />
     <Image Include="res\CBTN.bmp" />
     <Image Include="res\combox.bmp" />
+    <Image Include="res\Skin_XunLei.bmp" />
+    <Image Include="res\SMICO.ico" />
+    <Image Include="res\white_off.bmp" />
+    <Image Include="res\white_on.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
