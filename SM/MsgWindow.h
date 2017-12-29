@@ -20,7 +20,7 @@ public:
 	BOOL SetSkin(LPCTSTR lpBitmapName, COLORREF CaptionColor = 0x000000);
 
 	// 设置新闻标题、内容、链接
-	BOOL SetMsg(LPCTSTR lpNewsTitle, LPCTSTR lpNewsContent, LPCTSTR lpNewsURL = "");
+	BOOL SetMsg(LPCTSTR lpNewsTitle, LPCTSTR lpNewsContent, LPCTSTR lpNewsURL = _T(""));
 
 	// 设置自动关闭,如果为真,点击链接后窗口自动关闭
 	void SetAutoClose(BOOL bAutoClose);
@@ -85,7 +85,7 @@ protected:
 	virtual void PostNcDestroy();
 
 private:
-	void CreateControl(LPNEWSCONTROL pControl, int nType, int x, int y, int nWidth, int nHeight, CString strText = "");
+	void CreateControl(LPNEWSCONTROL pControl, int nType, int x, int y, int nWidth, int nHeight, CString strText =_T( ""));
 	BOOL DrawWindowEx();
 	BOOL DrawWindow();
 	void DrawButton(HDC hDC, LPNEWSCONTROL pControl);

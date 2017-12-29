@@ -60,9 +60,6 @@
     <ClInclude Include="TransParentEdit.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="WEComboBox.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SM.cpp">
@@ -96,9 +93,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TransParentEdit.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="WEComboBox.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

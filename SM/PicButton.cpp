@@ -95,7 +95,7 @@ void CPicButton::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		CBitmap *pOldBmp;
 		pOldBmp = MemDC.SelectObject(&m_OverBitmap);//加载停留状态
 		pDC->BitBlt(0, 0, rect.Width(), rect.Height(), &MemDC, 0, 0, SRCCOPY);
-		CString strText = "确定";
+		CString strText =_T( "确定");
 		COLORREF clrOld = pDC->SetTextColor(RGB(115, 115, 115));
 		int oldMode = pDC->SetBkMode(TRANSPARENT);
 		pDC->DrawText(m_text, -1, &lpDrawItemStruct->rcItem, DT_CENTER | DT_SINGLELINE | DT_VCENTER);
@@ -114,7 +114,7 @@ void CPicButton::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		BITMAP bmp;
 		m_NormalBitmap.GetObject(sizeof(bmp), &bmp);
 		pDC->BitBlt(0, 0, rect.Width(), rect.Height(), &MemDC, 0, 0, SRCCOPY);
-		CString strText = "确定";
+		CString strText = _T("确定");
 		COLORREF clrOld = pDC->SetTextColor(m_Color);
 		int oldMode = pDC->SetBkMode(TRANSPARENT);
 		pDC->DrawText(m_text, -1, &lpDrawItemStruct->rcItem, DT_CENTER | DT_SINGLELINE | DT_VCENTER);
@@ -133,7 +133,7 @@ void CPicButton::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		//pOldBmp->GetBitmap(&bmp);
 		m_PressedBitmap.GetObject(sizeof(bmp), &bmp);
 		pDC->BitBlt(0, 0, rect.Width(), rect.Height(), &MemDC, 0, 0, SRCCOPY);
-		CString strText = "确定";
+		CString strText = _T("确定");
 		COLORREF clrOld = pDC->SetTextColor(m_Color);
 		int oldMode = pDC->SetBkMode(TRANSPARENT);
 		pDC->DrawText(m_text, -1, &lpDrawItemStruct->rcItem, DT_CENTER | DT_SINGLELINE | DT_VCENTER);

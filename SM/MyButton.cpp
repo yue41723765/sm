@@ -11,11 +11,11 @@ IMPLEMENT_DYNAMIC(CMyButton, CButton)
 CMyButton::CMyButton()
 {
 	m_pFont = new CFont;
-	m_pFont->CreateFont(15, //以逻辑单位方式指定字体的高度  
+	m_pFont->CreateFont(18, //以逻辑单位方式指定字体的高度  
 		0, //以逻辑单位方式指定字体中字符的平均宽度  
 		0, //指定偏离垂线和X轴在显示面上的夹角（单位：0.1度）  
 		0, //指定字符串基线和X轴之间的夹角（单位：0.1度）  
-		FW_NORMAL, //指定字体磅数  
+		FW_BOLD, //指定字体磅数  
 		FALSE, //是不是斜体  
 		FALSE, //加不加下划线  
 		0, //指定是否是字体字符突出  

@@ -23,7 +23,7 @@
 #define EV_SKIN_SW_UPDATE							(EV_BASE_SKIN + 6)
 
 
-class _declspec(dllexport)  CTransparentEdit : public CEdit
+class  CTransparentEdit : public CEdit
 {
 public:
 	CTransparentEdit();

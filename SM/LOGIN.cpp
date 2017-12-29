@@ -33,11 +33,10 @@ void CLOGIN::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_USERNAME, m_username);
 	DDX_Text(pDX, IDC_PASSWORD, m_password);
-	//DDX_Control(pDX, IDC_LOGIN, b_login);
-	GetDlgItem(IDC_LOGIN)->SetWindowTextA(_T("强制更改"));
 	DDX_Control(pDX, IDC_LOGIN, b_login);
 	DDX_Control(pDX, IDC_USERNAME, m_user);
 	DDX_Control(pDX, IDC_PASSWORD, m_pass);
+	
 }
 
 
@@ -58,7 +57,8 @@ void CLOGIN::OnClickedLogin()
 	// TODO: 在此添加控件通知处理程序代码
 	//m_username m_password
 	UpdateData(TRUE);
-	string url = "http://117.131.227.94:8045/bpmx/perfRemind/perfRemind/perfRemindinfo/getTaskForExe.ht?username="+ m_username +"&password="+ m_password;
+	string url = _T("http://117.131.227.94:8045/bpmx/perfRemind/perfRemind/perfRemindinfo/getTaskForExe.ht?username=")+ m_username +_T("&password=")+ m_password;
+
 	string res=http.RequestJsonInfo(url);
 	int	ress = http.ParseJsonInfo(res);
 	CString t;
@@ -67,8 +67,8 @@ void CLOGIN::OnClickedLogin()
 	{
 
 		//CLOGIN::DestroyWindow();
-		WriteProfileString("windows", "name", m_username);
-		WriteProfileString("windows", "password", m_password);
+		WriteProfileString(_T("windows"), _T("name"), m_username);
+		WriteProfileString(_T("windows"),_T( "password"), m_password);
 
 
 		CDialog::OnOK();
@@ -77,7 +77,7 @@ void CLOGIN::OnClickedLogin()
 	}
 	if (ress == 0)
 	{
-		MessageBox("用户名或密码错误");
+		MessageBox(_T("用户名或密码错误"));
 	}
 
 }
@@ -95,8 +95,8 @@ BOOL CLOGIN::OnEraseBkgnd(CDC* pDC)
 	dcCompatible.SelectObject(&bitmap); //将位图选入设备描述表
 	CRect rect;
 	GetClientRect(&rect);
-	//pDC->BitBlt(0,0,rect.Width(),rect.Height(),&dcCompatible,.0,0,SRCCOPY);//1:1显示
-	pDC->StretchBlt(0,0,rect.Width(),rect.Height(),&dcCompatible,0,0,bmp.bmWidth,bmp.bmHeight,SRCCOPY);//放缩全屏显示
+	pDC->BitBlt(0,0,rect.Width(),rect.Height(),&dcCompatible,0,0,SRCCOPY);//1:1显示
+	//pDC->StretchBlt(0,0,rect.Width(),rect.Height(),&dcCompatible,0,0,bmp.bmWidth,bmp.bmHeight,SRCCOPY);//放缩全屏显示
 	return TRUE;//这一步不能忘记，不是默认的return
 	//return CDialog::OnEraseBkgnd(pDC);
 }
@@ -106,19 +106,38 @@ HBRUSH CLOGIN::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
 
 	HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
-	if ((pWnd->GetDlgCtrlID() == IDC_USERNAME) && (nCtlColor == CTLCOLOR_STATIC))
+	if ((pWnd->GetDlgCtrlID() == IDC_USERNAME) && (nCtlColor == CTLCOLOR_STATIC) || nCtlColor == CTLCOLOR_STATIC|| pWnd->GetDlgCtrlID() == IDC_PASSWORD)
 	{
 		pDC->SetBkColor(m_TextColor);
 		pDC->SetTextColor(m_EditColor);
-		//hbr = (HBRUSH)m_brMine;
-		//return m_brMine;
 	}
 	else
 	{
-		
 		hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
 		return hbr;
 	}
+	if (IDC_STATIC == pWnd->GetDlgCtrlID())//判断发出消息的空间是否是该静态文本框
+	 {
+	       pDC->SetTextColor(RGB(255, 255, 255));//设置文本颜色为红色
+		   pDC->SetBkMode(TRANSPARENT);//设置文本背景模式为透明
+		   CFont m_Font;
+		   m_Font.CreateFont(15, //以逻辑单位方式指定字体的高度  
+			   0, //以逻辑单位方式指定字体中字符的平均宽度  
+			   0, //指定偏离垂线和X轴在显示面上的夹角（单位：0.1度）  
+			   0, //指定字符串基线和X轴之间的夹角（单位：0.1度）  
+			   FW_SEMIBOLD, //指定字体磅数  
+			   FALSE, //是不是斜体  
+			   FALSE, //加不加下划线  
+			   0, //指定是否是字体字符突出  
+			   ANSI_CHARSET, //指定字体的字符集  
+			   OUT_DEFAULT_PRECIS, //指定所需的输出精度  
+			   CLIP_DEFAULT_PRECIS, //指定所需的剪贴精度  
+			   DEFAULT_QUALITY, //指示字体的输出质量  
+			   DEFAULT_PITCH | FF_SWISS, //指定字体的间距和家族  
+			   _T("宋体") //指定字体的字样名称  
+		   );
+		  pDC->SelectObject(&m_Font);//文字为15号字体
+     }
 	// TODO:  如果默认的不是所需画笔，则返回另一个画笔
 	return   HBRUSH(GetStockObject(HOLLOW_BRUSH));
 	//return hbr;
@@ -157,12 +176,12 @@ BOOL CLOGIN::OnInitDialog()
 	CDialog::OnInitDialog();
 
 	// TODO:  在此添加额外的初始化
+	SetAutoRun(TRUE);//设置开机自动启动  
+
 	//获得EDIT
 	LPCSTR str = "TestStr";
 	USES_CONVERSION;
 	LPCWSTR pwcStr = A2CW(str);
-	m_user.SetCueBanner(pwcStr,TRUE);
-	m_pass.SetCueBanner(pwcStr, FALSE);
 
 	//颜色赋值
 	m_DownColor = RGB(122, 103, 238);//按钮色
@@ -170,7 +189,7 @@ BOOL CLOGIN::OnInitDialog()
 	m_TextColor = RGB(248, 248, 255);//白色
 	m_EditColor = RGB(10, 10, 10);   //输入文字
 	m_brMine.CreateSolidBrush(m_TextColor); //白底黑字
-	b_login.Init(m_TextColor, m_UpColor, m_DownColor, m_DownColor, m_DownColor, "登   录");
+	b_login.Init(m_TextColor, m_UpColor, m_DownColor, m_DownColor, m_DownColor, _T("登   录"));
 
 	m_user.Enable(true);
 	m_user.SetClrBorder(m_DownColor, m_TextColor);
@@ -183,4 +202,31 @@ BOOL CLOGIN::OnInitDialog()
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // 异常: OCX 属性页应返回 FALSE
+}
+void CLOGIN::SetAutoRun(BOOL bAutoRun)
+{
+	HKEY hKey;
+	CString strRegPath = _T("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run");//找到系统的启动项  
+	if (bAutoRun)
+	{
+		if (RegOpenKeyEx(HKEY_CURRENT_USER, strRegPath, 0, KEY_ALL_ACCESS, &hKey) == ERROR_SUCCESS) //打开启动项       
+		{
+			TCHAR szModule[_MAX_PATH];
+			GetModuleFileName(NULL, szModule, _MAX_PATH);//得到本程序自身的全路径  
+			RegSetValueEx(hKey,_T( "Client"), 0, REG_SZ, (const BYTE*)(LPCSTR)szModule, strlen((LPCSTR)szModule)); //添加一个子Key,并设置值，"Client"是应用程序名字（不加后缀.exe）  
+			RegCloseKey(hKey); //关闭注册表  
+		}
+		else
+		{
+			AfxMessageBox(_T("系统参数错误,不能随系统启动"));
+		}
+	}
+	else
+	{
+		if (RegOpenKeyEx(HKEY_CURRENT_USER, strRegPath, 0, KEY_ALL_ACCESS, &hKey) == ERROR_SUCCESS)
+		{
+			RegDeleteValue(hKey, _T("Client"));
+			RegCloseKey(hKey);
+		}
+	}
 }

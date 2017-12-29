@@ -11,7 +11,7 @@
 #include "afxbutton.h"
 #include "MyButton.h"
 #include "PicButton.h"
-#include "WEComboBox.h"
+
 #define MAX_PATH 260
 using namespace std;
 
@@ -39,18 +39,27 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
-	
 	void setData(CString m_name);
+	void ListShow();
 public:
 	void ShowDialog();
 	afx_msg void ClistDlg(NMHDR *pNMHDR, LRESULT *pResult);
 	CListCtrlCl m_list_port;
-	//CComboBox
-	CWEComboBox m_chosecom;
-	afx_msg void OnSelchangeCombo1();
+	CComboBox m_chosecom;
+	afx_msg void OnSelchangeCombo();
 	afx_msg void OnClickedIdno();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	CPicButton OKButton;
 	CPicButton CancelBtn;
+	CMFCButton btn_next;
+	CMFCButton btn_previcous;
+	afx_msg void OnBtnPageup();
+	afx_msg void OnBtnPagedown();
+public:
+	int pageNo; //页数编号
+	int pageSize; // 每页显示条数
+	int intStart; // 开始记录
+	int intEnd; // 结束记录
+	int max_page; // 记录最大页数
 };
 

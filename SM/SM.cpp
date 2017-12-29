@@ -39,6 +39,15 @@ CSMApp theApp;
 
 BOOL CSMApp::InitInstance()
 {
+	AfxEnableControlContainer();
+
+
+
+	//…
+	skinppLoadSkin(_T("XP-Metallic.ssk"));//blue.ssk为工程文件夹下的皮肤文件
+								   //skinppLoadSkinFromRes();//静态资源加载， 在皮肤.h文件中有函数声明，参数自填
+
+ 
 	// 如果一个运行在 Windows XP 上的应用程序清单指定要
 	// 使用 ComCtl32.dll 版本 6 或更高版本来启用可视化方式，
 	//则需要 InitCommonControlsEx()。否则，将无法创建窗口。
@@ -50,9 +59,6 @@ BOOL CSMApp::InitInstance()
 	InitCommonControlsEx(&InitCtrls);
 
 	CWinApp::InitInstance();
-
-
-	AfxEnableControlContainer();
 
 	// 创建 shell 管理器，以防对话框包含
 	// 任何 shell 树视图控件或 shell 列表视图控件。
@@ -67,34 +73,11 @@ BOOL CSMApp::InitInstance()
 	// 例如修改为公司或组织名
 	SetRegistryKey(_T("应用程序向导生成的本地应用程序"));
 	CLOGIN logindlg;
-	//CSMDlg csmdlg;
-	
 	if (logindlg.DoModal()==IDOK)
 	{
 	     CSMDlg csmdlg;
-		 //m_pMainWnd = &csmdlg;
-		 //INT_PTR nResponse = csmdlg.DoModal();
 	};
 
-	//if (csmdlg.DoModal()==IDNO)
-	//{
-		//m_pMainWnd = &logindlg;
-	//}
-// 	CSMDlg dlg;
-// 	m_pMainWnd = &dlg;
-// 	INT_PTR nResponse = dlg.DoModal();
-// 	if (nResponse == IDOK)
-// 	{
-// 		// TODO: 在此放置处理何时用
-// 		//  “确定”来关闭对话框的代码
-// 	}
-// 	else if (nResponse == IDCANCEL)
-// 	{
-// 		// TODO: 在此放置处理何时用
-// 		//  “取消”来关闭对话框的代码
-// 	}
-// 
-// 	// 删除上面创建的 shell 管理器。
 	if (pShellManager != NULL)
  	{
  		delete pShellManager;

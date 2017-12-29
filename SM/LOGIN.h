@@ -40,4 +40,7 @@ public:
 	virtual BOOL OnInitDialog();
 	CTransparentEdit m_user;
 	CTransparentEdit m_pass;
+private:
+	CFont * m_pFont;
+	void SetAutoRun(BOOL bAutoRun);
 };

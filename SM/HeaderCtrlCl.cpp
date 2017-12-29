@@ -64,7 +64,7 @@ void CHeaderCtrlCl::OnPaint()
 		CFont nFont, *nOldFont;
 		//dc.SetTextColor(RGB(250,50,50)); 
 		dc.SetTextColor(m_color);
-		nFont.CreateFont(m_fontHeight, m_fontWith, 0, 0, FW_BOLD, FALSE, FALSE, 0, 0, 0, 0, 0, 0, _TEXT("宋体"));//创建字体 
+		nFont.CreateFont(m_fontHeight, m_fontWith, 0, 0, FW_BOLD, FALSE, FALSE, 0, 0, 0, 0, 0, 0, _TEXT("黑体"));//创建字体 
 		nOldFont = dc.SelectObject(&nFont);
 
 		UINT nFormat = DT_CENTER;

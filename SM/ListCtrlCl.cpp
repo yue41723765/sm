@@ -24,7 +24,6 @@ CListCtrlCl::~CListCtrlCl()
 {
 }
 
-
 BEGIN_MESSAGE_MAP(CListCtrlCl, CListCtrl)
 	ON_WM_MEASUREITEM()
 	ON_WM_MEASUREITEM_REFLECT()
@@ -153,9 +152,9 @@ void CListCtrlCl::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			pDC->SetTextColor(color);
 		}
 		CFont nFont, *nOldFont;
-		nFont.CreateFont(m_fontHeight, m_fontWith, 0, 0, 0, FALSE, FALSE, 0, 0, 0, 0, 0, 0, _TEXT("宋体"));//创建字体 
+		nFont.CreateFont(m_fontHeight, m_fontWith, 0, 0, 0, FALSE, FALSE, 0, 0, 0, 0, 0, 0, _TEXT("黑体"));//创建字体 
 		nOldFont = pDC->SelectObject(&nFont);
-		DrawText(lpDrawItemStruct->hDC, lpBuffer, strlen(lpBuffer),
+		DrawText(lpDrawItemStruct->hDC, lpBuffer, -1,
 			&rcItem, uFormat);
 
 		pDC->SelectStockObject(SYSTEM_FONT);
@@ -181,19 +180,19 @@ int CListCtrlCl::InsertColumn(int nCol, LPCTSTR lpszColumnHeading, int nFormat /
 	m_Header.m_HChar.Add(lpszColumnHeading);
 	if (nFormat == LVCFMT_LEFT)
 	{
-		m_Header.m_Format = m_Header.m_Format + "0";
+		m_Header.m_Format = m_Header.m_Format +_T( "0");
 	}
 	else if (nFormat == LVCFMT_CENTER)
 	{
-		m_Header.m_Format = m_Header.m_Format + "1";
+		m_Header.m_Format = m_Header.m_Format + _T("1");
 	}
 	else if (nFormat == LVCFMT_RIGHT)
 	{
-		m_Header.m_Format = m_Header.m_Format + "2";
+		m_Header.m_Format = m_Header.m_Format + _T("2");
 	}
 	else
 	{
-		m_Header.m_Format = m_Header.m_Format + "1";
+		m_Header.m_Format = m_Header.m_Format + _T("1");
 	}
 	return CListCtrl::InsertColumn(nCol, lpszColumnHeading, nFormat, nWidth, nSubItem);
 }
