@@ -46,6 +46,7 @@ BEGIN_MESSAGE_MAP(CLOGIN, CDialog)
 	ON_WM_CTLCOLOR()
 	ON_WM_DRAWITEM()
 	ON_EN_CHANGE(IDC_PASSWORD, &CLOGIN::OnEnChangePassword)
+	ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 
@@ -104,43 +105,53 @@ BOOL CLOGIN::OnEraseBkgnd(CDC* pDC)
 //输入框背景颜色 字体颜色
 HBRUSH CLOGIN::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
-
 	HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
-	if ((pWnd->GetDlgCtrlID() == IDC_USERNAME) && (nCtlColor == CTLCOLOR_STATIC) || nCtlColor == CTLCOLOR_STATIC|| pWnd->GetDlgCtrlID() == IDC_PASSWORD)
+
+	// TODO:  在此更改 DC 的任何属性  
+	CBrush   m_secbg;
+	m_secbg.DeleteObject();
+	m_secbg.m_hObject = NULL;
+	m_secbg.CreateSolidBrush(RGB(122, 122, 122));
+	switch (nCtlColor)
 	{
-		pDC->SetBkColor(m_TextColor);
-		pDC->SetTextColor(m_EditColor);
+	case CTLCOLOR_STATIC: //对所有静态文本控件的设置  
+	{
+		pDC->SetTextColor(RGB(255, 255, 255)); //设置字体颜色  
+		//pDC->SetBkColor(RGB(0,0,0));  
+		pDC->SetBkMode(TRANSPARENT); //设置背景为透明  
+		CFont m_Font;
+		m_Font.CreateFont(15, //以逻辑单位方式指定字体的高度  
+			0, //以逻辑单位方式指定字体中字符的平均宽度  
+			0, //指定偏离垂线和X轴在显示面上的夹角（单位：0.1度）  
+			0, //指定字符串基线和X轴之间的夹角（单位：0.1度）  
+			FW_SEMIBOLD, //指定字体磅数  
+			FALSE, //是不是斜体  
+			FALSE, //加不加下划线  
+			0, //指定是否是字体字符突出  
+			ANSI_CHARSET, //指定字体的字符集  
+			OUT_DEFAULT_PRECIS, //指定所需的输出精度  
+			CLIP_DEFAULT_PRECIS, //指定所需的剪贴精度  
+			DEFAULT_QUALITY, //指示字体的输出质量  
+			DEFAULT_PITCH | FF_SWISS, //指定字体的间距和家族  
+			_T("宋体") //指定字体的字样名称  
+		);
+		pDC->SelectObject(&m_Font);//文字为15号字体
+		break;
 	}
-	else
+
+	case CTLCOLOR_EDIT:
 	{
-		hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+		pDC->SetTextColor(RGB(0, 0, 0)); //设置字体颜色  
+										 //pDC->SetBkColor(RGB(0,0,0));  
+		pDC->SetBkColor(RGB(255, 255, 255));
+		//pDC->SetBkMode(TRANSPARENT); //设置背景为透明  
 		return hbr;
 	}
-	if (IDC_STATIC == pWnd->GetDlgCtrlID())//判断发出消息的空间是否是该静态文本框
-	 {
-	       pDC->SetTextColor(RGB(255, 255, 255));//设置文本颜色为红色
-		   pDC->SetBkMode(TRANSPARENT);//设置文本背景模式为透明
-		   CFont m_Font;
-		   m_Font.CreateFont(15, //以逻辑单位方式指定字体的高度  
-			   0, //以逻辑单位方式指定字体中字符的平均宽度  
-			   0, //指定偏离垂线和X轴在显示面上的夹角（单位：0.1度）  
-			   0, //指定字符串基线和X轴之间的夹角（单位：0.1度）  
-			   FW_SEMIBOLD, //指定字体磅数  
-			   FALSE, //是不是斜体  
-			   FALSE, //加不加下划线  
-			   0, //指定是否是字体字符突出  
-			   ANSI_CHARSET, //指定字体的字符集  
-			   OUT_DEFAULT_PRECIS, //指定所需的输出精度  
-			   CLIP_DEFAULT_PRECIS, //指定所需的剪贴精度  
-			   DEFAULT_QUALITY, //指示字体的输出质量  
-			   DEFAULT_PITCH | FF_SWISS, //指定字体的间距和家族  
-			   _T("宋体") //指定字体的字样名称  
-		   );
-		  pDC->SelectObject(&m_Font);//文字为15号字体
-     }
-	// TODO:  如果默认的不是所需画笔，则返回另一个画笔
-	return   HBRUSH(GetStockObject(HOLLOW_BRUSH));
-	//return hbr;
+	}
+
+	pDC->SetBkMode(TRANSPARENT); //设置背景为透明  
+	// TODO:  如果默认的不是所需画笔，则返回另一个画笔  
+	return m_secbg;
 }
 
 
@@ -229,4 +240,11 @@ void CLOGIN::SetAutoRun(BOOL bAutoRun)
 			RegCloseKey(hKey);
 		}
 	}
+}
+
+void CLOGIN::OnPaint()
+{
+	CPaintDC dc(this); // device context for painting
+					   // TODO: 在此处添加消息处理程序代码
+	//InvalidateRect(true);
 }

@@ -44,7 +44,7 @@ BOOL CSMApp::InitInstance()
 
 
 	//…
-	skinppLoadSkin(_T("XP-Metallic.ssk"));//blue.ssk为工程文件夹下的皮肤文件
+	skinppLoadSkin(_T("bbq.ssk"));//blue.ssk为工程文件夹下的皮肤文件
 								   //skinppLoadSkinFromRes();//静态资源加载， 在皮肤.h文件中有函数声明，参数自填
 
  

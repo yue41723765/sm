@@ -316,7 +316,7 @@ void CSMDlg::DeleteTray()
 	nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
 	nid.uCallbackMessage = WM_SHOWTASK;//自定义的消息名称 
 	nid.hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME));
-	//strcpy(nid.szTip, "通知");    //信息提示条
+	strcpy(nid.szTip, _T("通知"));    //信息提示条
 	//Shell_NotifyIcon(NIM_DELETE, &nid);    //在托盘区删除图标 
 }
 //最小化三连杀 托盘的点击事件
@@ -365,7 +365,7 @@ void CSMDlg::DeleteTray()
 	 nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
 	 nid.uCallbackMessage = WM_SHOWTASK;//自定义的消息名称 
 	 nid.hIcon = LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME));
-	 //strcpy(nid.szTip, "通知");    //信息提示条 
+	 strcpy(nid.szTip, _T("通知"));    //信息提示条 
 	 Shell_NotifyIcon(NIM_ADD, &nid);    //在托盘区添加图标 
 	 ShowWindow(SW_HIDE);    //隐藏主窗口
  }

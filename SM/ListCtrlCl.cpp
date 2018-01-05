@@ -38,7 +38,7 @@ END_MESSAGE_MAP()
 void CListCtrlCl::PreSubclassWindow()
 {
 	// TODO: 在此添加专用代码和/或调用基类
-	ModifyStyle(0, LVS_OWNERDRAWFIXED);
+	ModifyStyle(0, LVS_OWNERDRAWFIXED| LVS_EX_TRACKSELECT);
 	CListCtrl::PreSubclassWindow();
 	CHeaderCtrl *pHeader = GetHeaderCtrl();
 	m_Header.SubclassWindow(pHeader->GetSafeHwnd());

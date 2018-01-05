@@ -43,4 +43,6 @@ public:
 private:
 	CFont * m_pFont;
 	void SetAutoRun(BOOL bAutoRun);
+public:
+	afx_msg void OnPaint();
 };
